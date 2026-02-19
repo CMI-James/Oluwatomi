@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
 
 interface Lyric {
@@ -34,6 +34,7 @@ export default function LyricsPlayer({
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [hasCompleted, setHasCompleted] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -188,6 +189,7 @@ export default function LyricsPlayer({
       const maxWordIndex = currentLineWords.length - 1;
 
       if (lineIndex === lastLyricIndex && estimatedWordIndex >= maxWordIndex) {
+        setHasCompleted(true);
         setIsPlaying(false);
         onLyricsComplete?.();
         if (timerRef.current) clearInterval(timerRef.current);
@@ -247,7 +249,25 @@ export default function LyricsPlayer({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [togglePlayPause]);
 
-  // Removed autoplay effect as requested
+  // Autoplay shortly after entering the lyrics screen.
+  useEffect(() => {
+    if (isPlaying || hasCompleted) return;
+
+    const timer = setTimeout(async () => {
+      if (audioSrc && audioRef.current) {
+        try {
+          await audioRef.current.play();
+          setIsPlaying(true);
+        } catch (err) {
+          console.error('Autoplay blocked:', err);
+        }
+      } else {
+        setIsPlaying(true);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [audioSrc, isPlaying, hasCompleted]);
 
   // Handle volume fade-in
   useEffect(() => {
@@ -298,18 +318,17 @@ export default function LyricsPlayer({
     return `${minutes}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(2, '0')}`;
   };
 
-  const currentGradient = `linear-gradient(180deg, ${accentColor}40 0%, ${accentColor}10 50%, #000 100%)`;
-
   return (
     <div
-      className="relative h-screen flex flex-col overflow-hidden bg-black text-white"
+      className="relative h-screen flex flex-col overflow-hidden text-slate-900"
       style={{
-        background: `linear-gradient(to bottom, ${accentColor} 0%, #000000 100%)`,
+        background: `radial-gradient(circle at 10% 15%, ${accentColor}30 0%, transparent 38%), radial-gradient(circle at 88% 80%, ${accentColor}20 0%, transparent 44%), linear-gradient(to bottom, #ffffff 0%, #f8fafc 60%, #f1f5f9 100%)`,
       }}
     >
       <audio
         ref={audioRef}
         onEnded={() => {
+          setHasCompleted(true);
           setIsPlaying(false);
           onLyricsComplete?.();
         }}
@@ -325,8 +344,6 @@ export default function LyricsPlayer({
       >
         {lyrics.map((lyric, index) => {
           const isActive = index === currentLyricIndex;
-          const isPast = index < currentLyricIndex;
-
           return (
             <motion.div
               key={lyric.id}
@@ -362,12 +379,12 @@ export default function LyricsPlayer({
                       initial={false}
                       animate={{
                         color: isActive
-                          ? (isWordActive ? '#FFFFFF' : 'rgba(255,255,255,0.3)')
-                          : 'rgba(255,255,255,0.3)',
+                          ? (isWordActive ? '#0f172a' : 'rgba(71,85,105,0.45)')
+                          : 'rgba(71,85,105,0.45)',
                         textShadow: isWordActive && isActive
-                          ? '0 0 15px rgba(255,255,255,0.4)'
+                          ? `0 0 12px ${accentColor}55`
                           : 'none',
-                        opacity: isActive ? 1 : 0.5
+                        opacity: isActive ? 1 : 0.65
                       }}
                       transition={{
                         duration: 0.3,
@@ -386,7 +403,7 @@ export default function LyricsPlayer({
       </div>
 
       {/* Bottom Controls Area */}
-      <div className="absolute bottom-0 w-full bg-gradient-to-t from-black via-black/80 to-transparent pt-20 pb-10 px-6 max-w-4xl mx-auto inset-x-0">
+      <div className="absolute bottom-0 w-full bg-gradient-to-t from-white via-white/90 to-transparent pt-20 pb-10 px-6 max-w-4xl mx-auto inset-x-0">
         <div className="max-w-xl mx-auto space-y-6">
           {/* Progress Bar */}
           <div className="w-full h-8 flex items-center cursor-pointer relative group"
@@ -399,7 +416,7 @@ export default function LyricsPlayer({
             }}
           >
             {/* Track Background */}
-            <div className="w-full h-1.5 bg-white/20 rounded-full overflow-hidden">
+            <div className="w-full h-1.5 bg-slate-300/70 rounded-full overflow-hidden">
               {/* Fill is handled below, outside of this container to allow thumb overflow if needed, 
                     but for this style we strictly fill inside. 
                     Actually, let's keep the original structure but wrap it in the larger hit area div.
@@ -415,12 +432,12 @@ export default function LyricsPlayer({
                   backgroundColor: accentColor,
                 }}
               >
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg" />
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg border border-slate-300" />
               </motion.div>
             </div>
           </div>
 
-          <div className="flex justify-between text-xs font-medium text-white/50">
+          <div className="flex justify-between text-xs font-medium text-slate-600">
             <span>{formatTime(currentTime)}</span>
             <span>{formatTime(duration)}</span>
           </div>
@@ -429,25 +446,26 @@ export default function LyricsPlayer({
           <div className="flex items-center justify-center gap-10">
             <button
               onClick={handleSkipBackward}
-              className="text-white/70 hover:text-white transition-colors"
+              className="text-slate-600 hover:text-slate-900 transition-colors"
             >
               <SkipBack size={32} />
             </button>
 
             <button
               onClick={togglePlayPause}
-              className="p-4 rounded-full bg-white text-black hover:scale-105 transition-transform"
+              className="p-4 rounded-full text-white hover:scale-105 transition-transform shadow-lg"
+              style={{ backgroundColor: accentColor }}
             >
               {isPlaying ? (
-                <Pause size={36} fill="black" />
+                <Pause size={36} fill="white" />
               ) : (
-                <Play size={36} fill="black" className="ml-1" />
+                <Play size={36} fill="white" className="ml-1" />
               )}
             </button>
 
             <button
               onClick={handleSkipForward}
-              className="text-white/70 hover:text-white transition-colors"
+              className="text-slate-600 hover:text-slate-900 transition-colors"
             >
               <SkipForward size={32} />
             </button>
