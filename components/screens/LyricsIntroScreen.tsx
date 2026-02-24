@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import RomanticReveal from '../ui/RomanticReveal';
 
 interface LyricsIntroScreenProps {
@@ -48,7 +48,7 @@ export default function LyricsIntroScreen({
         >
           Hey {name},
         </motion.h2>
-        <p className={`text-lg md:text-2xl font-light italic leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
+        <p className={`min-h-[7.5rem] text-lg md:text-2xl font-light italic leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
           <RomanticReveal
             text="let's begin with a song that softly tells my story."
             baseDelay={1.8}
@@ -59,28 +59,32 @@ export default function LyricsIntroScreen({
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 3.9, duration: 0.7 }}
-          className={`mt-4 text-sm md:text-base ${isDark ? 'text-slate-400' : 'text-slate-500'}`}
+          className={`mt-4 h-6 text-sm md:text-base ${isDark ? 'text-slate-400' : 'text-slate-500'}`}
         >
           Hope you've increased your volume a little.
         </motion.p>
-        <AnimatePresence>
-          {isComplete && (
-            <motion.button
-              initial={{ opacity: 0, y: 10, filter: 'blur(4px)' }}
-              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, y: -6, filter: 'blur(4px)' }}
-              transition={{ delay: 0.35, duration: 0.55 }}
-              onClick={onContinue}
-              className="mt-6 w-full rounded-2xl px-6 py-3.5 text-white text-sm md:text-base font-semibold tracking-[0.05em] cursor-pointer"
-              style={{
-                background: `linear-gradient(135deg, ${accentColor}, ${accentColor}d9)`,
-                boxShadow: `0 12px 26px ${accentColor}40`,
-              }}
-            >
-              Continue
-            </motion.button>
-          )}
-        </AnimatePresence>
+        <div className="mt-6 h-[3.25rem] w-full">
+          <motion.button
+            initial={false}
+            animate={{
+              opacity: isComplete ? 1 : 0,
+              y: isComplete ? 0 : 10,
+              filter: isComplete ? 'blur(0px)' : 'blur(4px)',
+            }}
+            transition={{ duration: 0.45 }}
+            onClick={onContinue}
+            disabled={!isComplete}
+            className={`w-full rounded-2xl px-6 py-3.5 text-white text-sm md:text-base font-semibold tracking-[0.05em] ${
+              isComplete ? 'cursor-pointer' : 'pointer-events-none'
+            }`}
+            style={{
+              background: `linear-gradient(135deg, ${accentColor}, ${accentColor}d9)`,
+              boxShadow: `0 12px 26px ${accentColor}40`,
+            }}
+          >
+            Continue
+          </motion.button>
+        </div>
       </div>
     </motion.div>
   );

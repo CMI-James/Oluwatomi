@@ -256,6 +256,12 @@ export default function Home() {
         </motion.div>
       )}
     </AnimatePresence>
+    {themeMode === 'dark' && (
+      <>
+        <div className="pointer-events-none fixed inset-x-0 top-0 h-[10vh] z-[60] bg-gradient-to-b from-black/85 to-transparent" />
+        <div className="pointer-events-none fixed inset-x-0 bottom-0 h-[10vh] z-[60] bg-gradient-to-t from-black/85 to-transparent" />
+      </>
+    )}
     </>
   );
 }

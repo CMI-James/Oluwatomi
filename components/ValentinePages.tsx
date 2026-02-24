@@ -789,7 +789,7 @@ export default function ValentinePages({
                   well you voted for it for Thu, 16th Apr at 21:00
                 </p>
                 <div className={`h-px bg-linear-to-r from-transparent w-full mt-12 ${isDark ? 'via-slate-600' : 'via-slate-300'} to-transparent`} />
-                <Countdown accentColor={accentColor} />
+                <Countdown accentColor={accentColor} isDark={isDark} />
               </motion.div>
             </div>
           </motion.div>

@@ -98,24 +98,28 @@ export default function PostLyricsBridgeScreen({
             )}
           </AnimatePresence>
         </div>
-        <AnimatePresence>
-          {canContinue && (
-            <motion.button
-              initial={{ opacity: 0, y: 10, filter: 'blur(4px)' }}
-              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, y: -6, filter: 'blur(4px)' }}
-              transition={{ delay: 0.35, duration: 0.55 }}
-              onClick={onContinue}
-              className="mt-4 w-full rounded-2xl px-6 py-3.5 text-white text-sm md:text-base font-semibold tracking-[0.05em] cursor-pointer"
-              style={{
-                background: `linear-gradient(135deg, ${accentColor}, ${accentColor}d9)`,
-                boxShadow: `0 12px 26px ${accentColor}40`,
-              }}
-            >
-              Continue
-            </motion.button>
-          )}
-        </AnimatePresence>
+        <div className="mt-4 h-[3.25rem] w-full">
+          <motion.button
+            initial={false}
+            animate={{
+              opacity: canContinue ? 1 : 0,
+              y: canContinue ? 0 : 10,
+              filter: canContinue ? 'blur(0px)' : 'blur(4px)',
+            }}
+            transition={{ duration: 0.45 }}
+            onClick={onContinue}
+            disabled={!canContinue}
+            className={`w-full rounded-2xl px-6 py-3.5 text-white text-sm md:text-base font-semibold tracking-[0.05em] ${
+              canContinue ? 'cursor-pointer' : 'pointer-events-none'
+            }`}
+            style={{
+              background: `linear-gradient(135deg, ${accentColor}, ${accentColor}d9)`,
+              boxShadow: `0 12px 26px ${accentColor}40`,
+            }}
+          >
+            Continue
+          </motion.button>
+        </div>
       </div>
     </motion.div>
   );

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Heart, Palette, Volume2 } from "lucide-react";
 import ColorPicker from "./ColorPicker";
+import ScrollIndicator from "./ui/ScrollIndicator";
 
 interface SetupModalProps {
   onStart: (color: string, audioSrc: string, mode: "light" | "dark") => void;
@@ -178,7 +179,7 @@ export default function SetupModal({ onStart }: SetupModalProps) {
                     }`}
                     style={{ fontFamily: "var(--font-playfair), serif" }}
                   >
-                    Pick the color for tonight
+                    Pick your color
                   </h1>
                   <p className={`mt-2 text-sm ${selectedMode === "dark" ? "text-slate-400" : "text-slate-600"}`}>
                     Choose the vibe you want this story to carry.
@@ -215,7 +216,9 @@ export default function SetupModal({ onStart }: SetupModalProps) {
                           className={`rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${
                             selectedMode === "light"
                               ? "bg-slate-900 text-white"
-                              : "bg-white/10 text-slate-200 hover:bg-white/15"
+                              : selectedMode === "dark"
+                                ? "bg-white/10 text-slate-200 hover:bg-white/15"
+                                : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                           }`}
                         >
                           Light
@@ -225,7 +228,9 @@ export default function SetupModal({ onStart }: SetupModalProps) {
                           className={`rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${
                             selectedMode === "dark"
                               ? "bg-black text-white"
-                              : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                              : selectedMode === "light"
+                                ? "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                                : "bg-white/10 text-slate-200 hover:bg-white/15"
                           }`}
                         >
                           Dark
@@ -234,17 +239,7 @@ export default function SetupModal({ onStart }: SetupModalProps) {
                     </div>
                   </div>
 
-                  <button
-                    onClick={() => setStep("volume")}
-                    className="mt-6 w-full rounded-2xl px-6 py-4 text-white text-base font-semibold tracking-[0.08em] transition-all"
-                    style={{
-                      background: `linear-gradient(135deg, ${selectedColor}, ${selectedColor}d9)`,
-                      boxShadow: `0 14px 30px ${selectedColor}45`,
-                      fontFamily: "var(--font-playfair), serif",
-                    }}
-                  >
-                    Next
-                  </button>
+                  <div className="h-12" />
                 </motion.div>
               ) : (
                 <motion.div
@@ -289,35 +284,28 @@ export default function SetupModal({ onStart }: SetupModalProps) {
                     </p>
                   </div>
 
-                  <div className="mt-6 flex gap-3">
-                    <button
-                      onClick={() => setStep("color")}
-                      className={`w-1/3 rounded-2xl px-4 py-4 text-sm font-semibold transition-colors ${
-                        selectedMode === "dark"
-                          ? "text-slate-200 bg-white/10 hover:bg-white/15"
-                          : "text-slate-700 bg-slate-100 hover:bg-slate-200"
-                      }`}
-                    >
-                      Back
-                    </button>
-                    <button
-                      onClick={() => onStart(selectedColor, audioSrc, selectedMode)}
-                      className="w-2/3 rounded-2xl px-6 py-4 text-white text-base font-semibold tracking-[0.08em] transition-all"
-                      style={{
-                        background: `linear-gradient(135deg, ${selectedColor}, ${selectedColor}d9)`,
-                        boxShadow: `0 14px 30px ${selectedColor}45`,
-                        fontFamily: "var(--font-playfair), serif",
-                      }}
-                    >
-                      Open 💕
-                    </button>
-                  </div>
+                  <div className="h-12" />
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
         </div>
       </motion.div>
+
+      {step === "color" ? (
+        <ScrollIndicator
+          accentColor={selectedColor}
+          onNext={() => setStep("volume")}
+          delay={0.6}
+        />
+      ) : (
+        <ScrollIndicator
+          accentColor={selectedColor}
+          onNext={() => onStart(selectedColor, audioSrc, selectedMode)}
+          onPrevious={() => setStep("color")}
+          delay={0.6}
+        />
+      )}
     </motion.div>
   );
 }

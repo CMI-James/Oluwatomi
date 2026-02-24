@@ -529,12 +529,12 @@ export default function LyricsPlayer({
                         color: isActive
                           ? (isWordActive
                             ? (isDark ? '#f8fafc' : '#0f172a')
-                            : (isDark ? 'rgba(148,163,184,0.55)' : 'rgba(71,85,105,0.45)'))
-                          : (isDark ? 'rgba(148,163,184,0.5)' : 'rgba(71,85,105,0.45)'),
+                            : (isDark ? 'rgba(203,213,225,0.72)' : 'rgba(71,85,105,0.45)'))
+                          : (isDark ? 'rgba(203,213,225,0.66)' : 'rgba(71,85,105,0.45)'),
                         textShadow: isWordActive && isActive
                           ? `0 0 12px ${accentColor}55`
                           : 'none',
-                        opacity: isActive ? 1 : (isDark ? 0.72 : 0.65)
+                        opacity: isActive ? 1 : (isDark ? 0.84 : 0.65)
                       }}
                       transition={{
                         duration: 0.3,
