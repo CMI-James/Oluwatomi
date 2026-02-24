@@ -370,8 +370,8 @@ export default function ValentinePages({ accentColor, name = 'love' }: Valentine
 
       if (Math.abs(wheelAccumRef.current) < 65) return;
 
-      if (wheelAccumRef.current > 0) handleNavigation(1);
-      else handleNavigation(-1);
+      if (wheelAccumRef.current > 0) handleNavigation(-1);
+      else handleNavigation(1);
 
       wheelAccumRef.current = 0;
     };
@@ -379,10 +379,10 @@ export default function ValentinePages({ accentColor, name = 'love' }: Valentine
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'ArrowUp' || event.key === 'PageUp') {
         event.preventDefault();
-        handleNavigation(-1);
+        handleNavigation(1);
       } else if (event.key === 'ArrowDown' || event.key === 'PageDown') {
         event.preventDefault();
-        handleNavigation(1);
+        handleNavigation(-1);
       }
     };
 

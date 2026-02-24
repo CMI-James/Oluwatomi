@@ -50,17 +50,17 @@ export default function ScrollIndicator({
         event.key === ' '
       ) {
         event.preventDefault();
-        triggerPrevious();
+        triggerNext();
       } else if (event.key === 'ArrowDown' || event.key === 'PageDown') {
         event.preventDefault();
-        triggerNext();
+        triggerPrevious();
       }
     };
 
     const handleWheel = (event: WheelEvent) => {
       if (Math.abs(event.deltaY) < 22) return;
-      if (event.deltaY < 0) triggerPrevious();
-      else triggerNext();
+      if (event.deltaY < 0) triggerNext();
+      else triggerPrevious();
     };
 
     const handleTouchStart = (event: TouchEvent) => {
@@ -73,8 +73,8 @@ export default function ScrollIndicator({
       const delta = touchStartYRef.current - endY;
       touchStartYRef.current = null;
       if (Math.abs(delta) < 28) return;
-      if (delta > 0) triggerPrevious();
-      else triggerNext();
+      if (delta > 0) triggerNext();
+      else triggerPrevious();
     };
 
     window.addEventListener('keydown', handleKeyDown);
