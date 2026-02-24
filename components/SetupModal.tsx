@@ -156,16 +156,8 @@ export default function SetupModal({ onStart }: SetupModalProps) {
               className="text-[2rem] md:text-[2.25rem] leading-tight font-semibold text-slate-900"
               style={{ fontFamily: "var(--font-playfair), serif" }}
             >
-              I made this for you
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, delay: 0.2 }}
-              className="mt-2 text-[0.95rem] text-slate-600"
-            >
               Pick your color, turn the volume up, and open it.
-            </motion.p>
+            </motion.h1>
 
             <motion.div
               initial={{ opacity: 0, y: 10 }}
@@ -184,23 +176,18 @@ export default function SetupModal({ onStart }: SetupModalProps) {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.36 }}
-              className="mt-4 rounded-xl border border-slate-200/80 bg-white/65 p-3"
+              className="mt-4 rounded-xl border border-slate-200/80 bg-white/65 p-4"
             >
-              <p className="flex items-center gap-2 text-[0.68rem] uppercase tracking-[0.18em] text-slate-500">
-                <Volume2 className="h-3.5 w-3.5" />
+              <p className="flex items-center justify-center gap-2 text-[0.68rem] uppercase tracking-[0.18em] text-slate-500">
+                <motion.span
+                  animate={{ scale: [1, 1.2, 1], opacity: [0.8, 1, 0.8] }}
+                  transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
+                  className="inline-flex"
+                >
+                  <Volume2 className="h-4 w-4" />
+                </motion.span>
                 increase your volume
               </p>
-              <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-200/80">
-                <motion.div
-                  initial={{ scaleX: 0, opacity: 0.8 }}
-                  animate={{ scaleX: 1, opacity: 1 }}
-                  transition={{ duration: 2.8, delay: 0.65, ease: [0.16, 1, 0.3, 1] }}
-                  className="h-full origin-left rounded-full"
-                  style={{
-                    background: `linear-gradient(90deg, ${selectedColor}b0, ${selectedColor})`,
-                  }}
-                />
-              </div>
             </motion.div>
 
             <motion.button
