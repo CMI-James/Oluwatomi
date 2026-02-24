@@ -9,6 +9,8 @@ import ScrollIndicator from "./ui/ScrollIndicator";
 
 interface SetupModalProps {
   onStart: (color: string, audioSrc: string, mode: "light" | "dark") => void;
+  initialColor?: string;
+  initialMode?: "light" | "dark";
 }
 
 function FloatingHearts({ color }: { color: string }) {
@@ -50,11 +52,23 @@ function FloatingHearts({ color }: { color: string }) {
   );
 }
 
-export default function SetupModal({ onStart }: SetupModalProps) {
-  const [selectedColor, setSelectedColor] = useState("#ec4899");
+export default function SetupModal({
+  onStart,
+  initialColor = "#ec4899",
+  initialMode = "light",
+}: SetupModalProps) {
+  const [selectedColor, setSelectedColor] = useState(initialColor);
   const [audioSrc] = useState("/music/lyrics-music.mp3");
-  const [selectedMode, setSelectedMode] = useState<"light" | "dark">("light");
+  const [selectedMode, setSelectedMode] = useState<"light" | "dark">(initialMode);
   const [step, setStep] = useState<"color" | "volume">("color");
+
+  useEffect(() => {
+    setSelectedColor(initialColor);
+  }, [initialColor]);
+
+  useEffect(() => {
+    setSelectedMode(initialMode);
+  }, [initialMode]);
 
   useEffect(() => {
     const root = document.documentElement;

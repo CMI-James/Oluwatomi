@@ -218,7 +218,12 @@ export default function Home() {
       {!nameAccepted ? (
         <NameGate onSubmit={handleNameSubmit} />
       ) : !hasStarted ? (
-        <SetupModal key="setup" onStart={handleSetupStart} />
+        <SetupModal
+          key="setup"
+          onStart={handleSetupStart}
+          initialColor={accentColor}
+          initialMode={themeMode}
+        />
       ) : showLyricsIntro ? (
         <LyricsIntroScreen
           key="lyrics-intro"

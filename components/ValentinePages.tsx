@@ -807,32 +807,34 @@ export default function ValentinePages({
                 </p>
                 <div className={`h-px bg-linear-to-r from-transparent w-full mt-12 ${isDark ? 'via-slate-600' : 'via-slate-300'} to-transparent`} />
                 <Countdown accentColor={accentColor} isDark={isDark} />
-                <motion.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={restartFlow}
-                  className="mt-8 rounded-full px-8 py-3 text-sm font-semibold border"
-                  style={{
-                    color: accentColor,
-                    borderColor: `${accentColor}66`,
-                    backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.75)',
-                  }}
-                >
-                  Restart
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={onReturnToSetup}
-                  className="mt-3 rounded-full px-8 py-3 text-sm font-semibold border"
-                  style={{
-                    color: accentColor,
-                    borderColor: `${accentColor}66`,
-                    backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.75)',
-                  }}
-                >
-                  Choose Color Again
-                </motion.button>
+                <div className="mt-8 flex flex-col items-center gap-4">
+                  <motion.button
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={restartFlow}
+                    className="rounded-full px-8 py-3 text-sm font-semibold border"
+                    style={{
+                      color: accentColor,
+                      borderColor: `${accentColor}66`,
+                      backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.75)',
+                    }}
+                  >
+                    Restart
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={onReturnToSetup}
+                    className="rounded-full px-8 py-3 text-sm font-semibold border"
+                    style={{
+                      color: accentColor,
+                      borderColor: `${accentColor}66`,
+                      backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.75)',
+                    }}
+                  >
+                    Setup
+                  </motion.button>
+                </div>
               </motion.div>
             </div>
           </motion.div>
