@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Heart, Palette, Volume2 } from "lucide-react";
 import ColorPicker from "./ColorPicker";
@@ -55,6 +55,15 @@ export default function SetupModal({ onStart }: SetupModalProps) {
   const [audioSrc] = useState("/music/lyrics-music.mp3");
   const [selectedMode, setSelectedMode] = useState<"light" | "dark">("light");
   const [step, setStep] = useState<"color" | "volume">("color");
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (selectedMode === "dark") {
+      root.classList.add("dark");
+    } else {
+      root.classList.remove("dark");
+    }
+  }, [selectedMode]);
 
   return (
     <motion.div
@@ -155,7 +164,9 @@ export default function SetupModal({ onStart }: SetupModalProps) {
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-7">
               <div
-                className="inline-flex items-center gap-2 rounded-full border bg-white/80 px-3 py-1 text-[0.64rem] uppercase tracking-[0.17em]"
+                className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[0.64rem] uppercase tracking-[0.17em] ${
+                  selectedMode === "dark" ? "bg-white/10" : "bg-white/80"
+                }`}
                 style={{ borderColor: `${selectedColor}3d`, color: selectedColor }}
               >
                 <Heart className="h-3.5 w-3.5" fill="currentColor" />
