@@ -50,10 +50,10 @@ export default function ScrollIndicator({
         event.key === ' '
       ) {
         event.preventDefault();
-        triggerNext();
+        triggerPrevious();
       } else if (event.key === 'ArrowDown' || event.key === 'PageDown') {
         event.preventDefault();
-        triggerPrevious();
+        triggerNext();
       }
     };
 

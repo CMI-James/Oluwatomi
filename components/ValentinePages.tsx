@@ -433,10 +433,10 @@ export default function ValentinePages({
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'ArrowUp' || event.key === 'PageUp') {
         event.preventDefault();
-        handleNavigation(1);
+        handleNavigation(-1);
       } else if (event.key === 'ArrowDown' || event.key === 'PageDown') {
         event.preventDefault();
-        handleNavigation(-1);
+        handleNavigation(1);
       }
     };
 

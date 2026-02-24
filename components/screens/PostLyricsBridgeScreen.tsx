@@ -17,10 +17,12 @@ export default function PostLyricsBridgeScreen({
 }: PostLyricsBridgeScreenProps) {
   const [showQuestionLine, setShowQuestionLine] = useState(false);
   const [showPointLine, setShowPointLine] = useState(false);
+  const [canContinue, setCanContinue] = useState(false);
 
   useEffect(() => {
     setShowQuestionLine(false);
     setShowPointLine(false);
+    setCanContinue(false);
 
     const questionTimer = setTimeout(() => setShowQuestionLine(true), 950);
     const pointTimer = setTimeout(() => setShowPointLine(true), 3200);
@@ -82,27 +84,33 @@ export default function PostLyricsBridgeScreen({
                 transition={{ duration: 0.75 }}
                 className="text-2xl md:text-3xl leading-snug text-slate-700 mt-4 font-bold tracking-tight font-outfit"
               >
-                <RomanticReveal text="Let's go straight to the point then." baseDelay={0.08} />
+                <RomanticReveal
+                  text="Let's go straight to the point then."
+                  baseDelay={0.08}
+                  onComplete={() => setCanContinue(true)}
+                />
               </motion.p>
             )}
           </AnimatePresence>
         </div>
-        <motion.button
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 3.7, duration: 0.6 }}
-          onClick={onContinue}
-          disabled={!showPointLine}
-          className={`mt-4 w-full rounded-2xl px-6 py-3.5 text-white text-sm md:text-base font-semibold tracking-[0.05em] ${
-            showPointLine ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'
-          }`}
-          style={{
-            background: `linear-gradient(135deg, ${accentColor}, ${accentColor}d9)`,
-            boxShadow: `0 12px 26px ${accentColor}40`,
-          }}
-        >
-          Continue
-        </motion.button>
+        <AnimatePresence>
+          {canContinue && (
+            <motion.button
+              initial={{ opacity: 0, y: 10, filter: 'blur(4px)' }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, y: -6, filter: 'blur(4px)' }}
+              transition={{ delay: 0.35, duration: 0.55 }}
+              onClick={onContinue}
+              className="mt-4 w-full rounded-2xl px-6 py-3.5 text-white text-sm md:text-base font-semibold tracking-[0.05em] cursor-pointer"
+              style={{
+                background: `linear-gradient(135deg, ${accentColor}, ${accentColor}d9)`,
+                boxShadow: `0 12px 26px ${accentColor}40`,
+              }}
+            >
+              Continue
+            </motion.button>
+          )}
+        </AnimatePresence>
       </div>
     </motion.div>
   );

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import RomanticReveal from '../ui/RomanticReveal';
 
 interface LyricsIntroScreenProps {
@@ -58,22 +58,24 @@ export default function LyricsIntroScreen({
         >
           Hope you've increased your volume a little.
         </motion.p>
-        <motion.button
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 4.2, duration: 0.6 }}
-          onClick={onContinue}
-          disabled={!isComplete}
-          className={`mt-6 w-full rounded-2xl px-6 py-3.5 text-white text-sm md:text-base font-semibold tracking-[0.05em] ${
-            isComplete ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'
-          }`}
-          style={{
-            background: `linear-gradient(135deg, ${accentColor}, ${accentColor}d9)`,
-            boxShadow: `0 12px 26px ${accentColor}40`,
-          }}
-        >
-          Continue
-        </motion.button>
+        <AnimatePresence>
+          {isComplete && (
+            <motion.button
+              initial={{ opacity: 0, y: 10, filter: 'blur(4px)' }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, y: -6, filter: 'blur(4px)' }}
+              transition={{ delay: 0.35, duration: 0.55 }}
+              onClick={onContinue}
+              className="mt-6 w-full rounded-2xl px-6 py-3.5 text-white text-sm md:text-base font-semibold tracking-[0.05em] cursor-pointer"
+              style={{
+                background: `linear-gradient(135deg, ${accentColor}, ${accentColor}d9)`,
+                boxShadow: `0 12px 26px ${accentColor}40`,
+              }}
+            >
+              Continue
+            </motion.button>
+          )}
+        </AnimatePresence>
       </div>
     </motion.div>
   );
