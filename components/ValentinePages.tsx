@@ -293,8 +293,15 @@ export default function ValentinePages({ accentColor, name = 'love', initialAudi
       initialAudio.defaultMuted = false;
       initialAudio.muted = false;
       initialAudio.currentTime = 0; // Rewind the silently prestarted audio
+      if (initialAudio.volume < START_MUSIC_VOLUME) {
+        initialAudio.volume = START_MUSIC_VOLUME;
+      }
       audioRef.current = initialAudio;
-      setIsAudioPlaying(!initialAudio.paused);
+      const isAudiblyPlaying =
+        !initialAudio.paused &&
+        !initialAudio.muted &&
+        initialAudio.volume > 0.01;
+      setIsAudioPlaying(isAudiblyPlaying);
       return () => {
         clearFadeTimer();
       };

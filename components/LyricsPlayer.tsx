@@ -108,8 +108,14 @@ export default function LyricsPlayer({
       initialAudio.defaultMuted = false;
       initialAudio.muted = false;
       initialAudio.currentTime = 0; // Rewind the silently prestarted audio
+      if (initialAudio.volume < 0.1) {
+        initialAudio.volume = 0.1;
+      }
       audioRef.current = initialAudio;
-      const alreadyPlaying = !initialAudio.paused;
+      const alreadyPlaying =
+        !initialAudio.paused &&
+        !initialAudio.muted &&
+        initialAudio.volume > 0.01;
       hasAutoplayStartedRef.current = alreadyPlaying;
       setIsPlaying(alreadyPlaying);
     }

@@ -81,55 +81,44 @@ export default function Home() {
   const [enteredName, setEnteredName] = useState('');
   const lyricsAudioRef = useRef<HTMLAudioElement | null>(null);
   const valentineAudioRef = useRef<HTMLAudioElement | null>(null);
-  const hasUnlockedAudioRef = useRef(false);
 
-  const unlockAudioElement = async (audio: HTMLAudioElement | null) => {
+  const primeAudioFromTap = (audio: HTMLAudioElement | null) => {
     if (!audio) return;
-    try {
-      const previousMuted = audio.muted;
-      const previousVolume = audio.volume;
-      const previousTime = audio.currentTime;
-      const previousLoop = audio.loop;
-      audio.defaultMuted = true;
-      audio.muted = true;
-      audio.loop = false;
-      audio.volume = 0;
-      await audio.play();
-      audio.pause();
-      audio.currentTime = previousTime || 0;
-      audio.defaultMuted = false;
+
+    const previousMuted = audio.muted;
+    const previousDefaultMuted = audio.defaultMuted;
+    const previousVolume = audio.volume;
+    const previousLoop = audio.loop;
+    const previousTime = audio.currentTime;
+
+    audio.defaultMuted = true;
+    audio.muted = true;
+    audio.volume = 0;
+    audio.loop = false;
+
+    const restore = () => {
+      audio.defaultMuted = previousDefaultMuted;
       audio.muted = previousMuted;
       audio.volume = previousVolume;
       audio.loop = previousLoop;
-    } catch {
-      // Best-effort: if this fails, later gesture-bound play attempts still run.
+      audio.currentTime = previousTime || 0;
+    };
+
+    const playPromise = audio.play();
+    if (!playPromise) {
+      restore();
+      return;
     }
+
+    playPromise
+      .then(() => {
+        audio.pause();
+      })
+      .catch(() => {
+        // Ignore; this is only a best-effort prime.
+      })
+      .finally(restore);
   };
-
-  const unlockAllAudio = async () => {
-    if (hasUnlockedAudioRef.current) return;
-    hasUnlockedAudioRef.current = true;
-    await Promise.all([
-      unlockAudioElement(lyricsAudioRef.current),
-      unlockAudioElement(valentineAudioRef.current),
-    ]);
-  };
-
-  useEffect(() => {
-    const unlockOnGesture = () => {
-      void unlockAllAudio();
-    };
-
-    window.addEventListener('pointerdown', unlockOnGesture, { passive: true });
-    window.addEventListener('touchend', unlockOnGesture, { passive: true });
-    window.addEventListener('keydown', unlockOnGesture);
-
-    return () => {
-      window.removeEventListener('pointerdown', unlockOnGesture);
-      window.removeEventListener('touchend', unlockOnGesture);
-      window.removeEventListener('keydown', unlockOnGesture);
-    };
-  }, []);
 
   const initLyricsAudio = () => {
     if (lyricsAudioRef.current) {
@@ -153,6 +142,10 @@ export default function Home() {
   };
 
   const handleSetupStart = (color: string, audio: string) => {
+    // Prime both audio elements on the explicit "Open" tap for mobile browsers.
+    primeAudioFromTap(lyricsAudioRef.current);
+    primeAudioFromTap(valentineAudioRef.current);
+
     setAccentColor(color);
     setAudioSrc(audio);
     setHasStarted(true);
@@ -208,7 +201,6 @@ export default function Home() {
           name={enteredName || 'love'}
           accentColor={accentColor}
           onContinue={() => {
-            void unlockAllAudio();
             initLyricsAudio();
             setShowLyricsIntro(false);
           }}
@@ -223,7 +215,6 @@ export default function Home() {
           name={enteredName || 'love'}
           accentColor={accentColor}
           onContinue={() => {
-            void unlockAllAudio();
             initValentineAudio();
             setShowPostLyricsBridge(false);
             setShowValentine(true);
