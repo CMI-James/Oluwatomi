@@ -26,13 +26,15 @@ export default function LyricsIntroScreen({
       animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
       exit={{ opacity: 0, y: -16, filter: 'blur(8px)' }}
       transition={{ duration: 1.05, ease: [0.22, 1, 0.36, 1] }}
-      className="fixed inset-0 flex items-center justify-center px-6"
+      className="fixed inset-0 overflow-hidden"
       style={{
+        backgroundColor: isDark ? '#0b0f16' : '#f8fafc',
         background: isDark
           ? 'radial-gradient(circle at 14% 16%, rgba(244,63,94,.18) 0%, transparent 40%), radial-gradient(circle at 84% 82%, rgba(59,130,246,.12) 0%, transparent 42%), linear-gradient(180deg, #06080d 0%, #0b0f16 100%)'
           : 'radial-gradient(circle at 14% 16%, rgba(244,63,94,.14) 0%, transparent 40%), radial-gradient(circle at 84% 82%, rgba(59,130,246,.12) 0%, transparent 42%), linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
       }}
     >
+      <div className="h-full w-full flex items-center justify-center px-6">
       <div
         className={`max-w-2xl w-full h-[30rem] md:h-[33rem] rounded-4xl border backdrop-blur-xl p-8 md:p-11 text-center shadow-[0_24px_80px_rgba(15,23,42,0.10)] flex flex-col justify-center ${
           isDark ? 'bg-black/45' : 'bg-white/88'
@@ -85,6 +87,7 @@ export default function LyricsIntroScreen({
             Continue
           </motion.button>
         </div>
+      </div>
       </div>
     </motion.div>
   );
