@@ -15,6 +15,7 @@ interface LyricsPlayerProps {
   lyrics: Lyric[];
   accentColor: string;
   audioSrc?: string;
+  initialAudio?: HTMLAudioElement | null;
   startDelay?: number;
   onLyricsComplete?: () => void;
 }
@@ -88,6 +89,7 @@ export default function LyricsPlayer({
   lyrics,
   accentColor,
   audioSrc,
+  initialAudio = null,
   startDelay = 0,
   onLyricsComplete,
 }: LyricsPlayerProps) {
@@ -98,7 +100,31 @@ export default function LyricsPlayer({
   const [duration, setDuration] = useState(0);
   const [hasCompleted, setHasCompleted] = useState(false);
 
-  const audioRef = useRef<HTMLAudioElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Set up initialAudio if provided
+  useEffect(() => {
+    if (initialAudio) {
+      initialAudio.defaultMuted = false;
+      initialAudio.muted = false;
+      audioRef.current = initialAudio;
+    }
+  }, [initialAudio]);
+
+  // Handle ended event globally for both initialAudio and standard element
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const handleEnded = () => {
+      setHasCompleted(true);
+      setIsPlaying(false);
+      onLyricsComplete?.();
+    };
+
+    audio.addEventListener('ended', handleEnded);
+    return () => audio.removeEventListener('ended', handleEnded);
+  }, [initialAudio, onLyricsComplete]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const hasAutoplayStartedRef = useRef(false);
@@ -430,16 +456,13 @@ export default function LyricsPlayer({
     >
       <BackgroundAnimations accentColor={accentColor} />
 
-      <audio
-        ref={audioRef}
-        onEnded={() => {
-          setHasCompleted(true);
-          setIsPlaying(false);
-          onLyricsComplete?.();
-        }}
-        className="hidden"
-        src={audioSrc || undefined}
-      />
+      {!initialAudio && audioSrc && (
+        <audio
+          ref={audioRef}
+          className="hidden"
+          src={audioSrc}
+        />
+      )}
 
       {/* Lyrics Scroll Area */}
       <div

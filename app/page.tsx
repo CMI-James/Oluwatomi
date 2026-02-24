@@ -76,49 +76,37 @@ export default function Home() {
   const [accessMode, setAccessMode] = useState<AccessMode>(null);
   const [nameAccepted, setNameAccepted] = useState(false);
   const [enteredName, setEnteredName] = useState('');
+  const lyricsAudioRef = useRef<HTMLAudioElement | null>(null);
   const valentineAudioRef = useRef<HTMLAudioElement | null>(null);
 
-  const primeAudioOnGesture = (src: string) => {
-    try {
-      const audio = new Audio(src);
-      audio.defaultMuted = false;
-      audio.muted = false;
-      audio.volume = 0.01;
-      const playPromise = audio.play();
-      if (playPromise && typeof playPromise.then === 'function') {
-        playPromise
-          .then(() => {
-            audio.pause();
-            audio.currentTime = 0;
-            audio.src = '';
-          })
-          .catch(() => {
-            audio.src = '';
-          });
-      }
-    } catch {
-      // Ignore priming errors; normal playback fallbacks still run in player components.
+  const initGlobalAudio = (src: string) => {
+    if (!lyricsAudioRef.current) {
+      try {
+        const lAudio = new Audio(src);
+        lAudio.defaultMuted = false;
+        lAudio.muted = false;
+        lAudio.volume = 0;
+        lAudio.play().then(() => {
+          lAudio.pause();
+          lAudio.currentTime = 0;
+        }).catch(() => {});
+        lyricsAudioRef.current = lAudio;
+      } catch (e) {}
     }
-  };
 
-  const startValentineAudioOnGesture = () => {
-    try {
-      if (!valentineAudioRef.current) {
-        const audio = new Audio('/music/blue.mp3');
-        audio.loop = true;
-        audio.defaultMuted = false;
-        audio.muted = false;
-        audio.volume = 0.25;
-        valentineAudioRef.current = audio;
-      }
-      const audio = valentineAudioRef.current;
-      audio.defaultMuted = false;
-      audio.muted = false;
-      void audio.play().catch(() => {
-        // ValentinePages still has fallback gesture retries if this fails.
-      });
-    } catch {
-      // Ignore and let ValentinePages handle fallback.
+    if (!valentineAudioRef.current) {
+      try {
+        const vAudio = new Audio('/music/blue.mp3');
+        vAudio.loop = true;
+        vAudio.defaultMuted = false;
+        vAudio.muted = false;
+        vAudio.volume = 0;
+        vAudio.play().then(() => {
+          vAudio.pause();
+          vAudio.currentTime = 0;
+        }).catch(() => {});
+        valentineAudioRef.current = vAudio;
+      } catch (e) {}
     }
   };
 
@@ -175,7 +163,7 @@ export default function Home() {
           name={enteredName || 'love'}
           accentColor={accentColor}
           onContinue={() => {
-            primeAudioOnGesture(audioSrc);
+            initGlobalAudio(audioSrc);
             setShowLyricsIntro(false);
           }}
           onBack={() => {
@@ -189,7 +177,6 @@ export default function Home() {
           name={enteredName || 'love'}
           accentColor={accentColor}
           onContinue={() => {
-            startValentineAudioOnGesture();
             setShowPostLyricsBridge(false);
             setShowValentine(true);
           }}
@@ -207,6 +194,7 @@ export default function Home() {
             lyrics={SAMPLE_LYRICS}
             accentColor={accentColor}
             audioSrc={audioSrc}
+            initialAudio={lyricsAudioRef.current}
             startDelay={0.2}
             onLyricsComplete={handleLyricsComplete}
           />
