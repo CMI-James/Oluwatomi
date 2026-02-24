@@ -156,7 +156,7 @@ export default function Home() {
     }
 
     if (YOU_CANT_FOOL_ME_NAMES.has(normalized)) {
-      window.location.href = '/you-cant-fool-me';
+      window.location.href = 'https://www.acoblighting.com';
       return;
     }
 
