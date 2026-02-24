@@ -7,7 +7,7 @@ import { Heart, Palette, Volume2 } from "lucide-react";
 import ColorPicker from "./ColorPicker";
 
 interface SetupModalProps {
-  onStart: (color: string, audioSrc: string) => void;
+  onStart: (color: string, audioSrc: string, mode: "light" | "dark") => void;
 }
 
 function FloatingHearts({ color }: { color: string }) {
@@ -52,6 +52,7 @@ function FloatingHearts({ color }: { color: string }) {
 export default function SetupModal({ onStart }: SetupModalProps) {
   const [selectedColor, setSelectedColor] = useState("#ec4899");
   const [audioSrc] = useState("/music/lyrics-music.mp3");
+  const [selectedMode, setSelectedMode] = useState<"light" | "dark">("light");
   const [step, setStep] = useState<"color" | "volume">("color");
 
   return (
@@ -63,9 +64,11 @@ export default function SetupModal({ onStart }: SetupModalProps) {
       className="fixed inset-0 flex items-center justify-center z-50 overflow-hidden"
       style={{
         background: `
-          radial-gradient(ellipse at 22% 16%, ${selectedColor}2e 0%, transparent 48%),
-          radial-gradient(ellipse at 80% 84%, ${selectedColor}22 0%, transparent 52%),
-          linear-gradient(160deg, #f9fbff 0%, #f7f6ff 42%, #fff5fa 100%)
+          radial-gradient(ellipse at 22% 16%, ${selectedColor}${selectedMode === "dark" ? "24" : "2e"} 0%, transparent 48%),
+          radial-gradient(ellipse at 80% 84%, ${selectedColor}${selectedMode === "dark" ? "1a" : "22"} 0%, transparent 52%),
+          ${selectedMode === "dark"
+            ? "linear-gradient(160deg, #07090c 0%, #0b0d11 42%, #11131a 100%)"
+            : "linear-gradient(160deg, #f9fbff 0%, #f7f6ff 42%, #fff5fa 100%)"}
         `,
       }}
     >
@@ -125,10 +128,20 @@ export default function SetupModal({ onStart }: SetupModalProps) {
           }}
         />
         <div
-          className="relative rounded-[2.1rem] border border-white/70 bg-white/72 backdrop-blur-2xl px-7 py-8 md:px-9 md:py-10 shadow-[0_28px_90px_rgba(15,23,42,0.12)] overflow-hidden"
+          className={`relative rounded-[2.1rem] border backdrop-blur-2xl px-7 py-8 md:px-9 md:py-10 shadow-[0_28px_90px_rgba(15,23,42,0.12)] overflow-hidden ${
+            selectedMode === "dark"
+              ? "border-white/10 bg-black/45"
+              : "border-white/70 bg-white/72"
+          }`}
           style={{ boxShadow: `0 28px 90px ${selectedColor}26` }}
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-white/70 via-white/35 to-white/5 pointer-events-none" />
+          <div
+            className={`absolute inset-0 pointer-events-none ${
+              selectedMode === "dark"
+                ? "bg-gradient-to-br from-white/8 via-white/4 to-transparent"
+                : "bg-gradient-to-br from-white/70 via-white/35 to-white/5"
+            }`}
+          />
           <div
             className="absolute -top-20 -right-12 h-52 w-52 rounded-full pointer-events-none"
             style={{ background: `radial-gradient(circle, ${selectedColor}35 0%, transparent 70%)` }}
@@ -160,21 +173,65 @@ export default function SetupModal({ onStart }: SetupModalProps) {
                   transition={{ duration: 0.35 }}
                 >
                   <h1
-                    className="text-[1.9rem] md:text-[2.15rem] leading-tight font-semibold text-slate-900"
+                    className={`text-[1.9rem] md:text-[2.15rem] leading-tight font-semibold ${
+                      selectedMode === "dark" ? "text-slate-100" : "text-slate-900"
+                    }`}
                     style={{ fontFamily: "var(--font-playfair), serif" }}
                   >
                     Pick the color for tonight
                   </h1>
-                  <p className="mt-2 text-sm text-slate-600">
+                  <p className={`mt-2 text-sm ${selectedMode === "dark" ? "text-slate-400" : "text-slate-600"}`}>
                     Choose the vibe you want this story to carry.
                   </p>
 
-                  <div className="mt-6 rounded-2xl border border-slate-200/80 bg-white/70 p-4">
-                    <div className="mb-3 flex items-center gap-2 text-[0.72rem] uppercase tracking-[0.18em] text-slate-500">
+                  <div
+                    className={`mt-6 rounded-2xl border p-4 ${
+                      selectedMode === "dark"
+                        ? "border-white/12 bg-white/6"
+                        : "border-slate-200/80 bg-white/70"
+                    }`}
+                  >
+                    <div
+                      className={`mb-3 flex items-center gap-2 text-[0.72rem] uppercase tracking-[0.18em] ${
+                        selectedMode === "dark" ? "text-slate-400" : "text-slate-500"
+                      }`}
+                    >
                       <Palette className="h-3.5 w-3.5" />
                       choose your color
                     </div>
                     <ColorPicker value={selectedColor} onChange={setSelectedColor} />
+
+                    <div className="mt-5">
+                      <div
+                        className={`mb-2 text-[0.7rem] uppercase tracking-[0.16em] ${
+                          selectedMode === "dark" ? "text-slate-400" : "text-slate-500"
+                        }`}
+                      >
+                        choose mode
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          onClick={() => setSelectedMode("light")}
+                          className={`rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${
+                            selectedMode === "light"
+                              ? "bg-slate-900 text-white"
+                              : "bg-white/10 text-slate-200 hover:bg-white/15"
+                          }`}
+                        >
+                          Light
+                        </button>
+                        <button
+                          onClick={() => setSelectedMode("dark")}
+                          className={`rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${
+                            selectedMode === "dark"
+                              ? "bg-black text-white"
+                              : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                          }`}
+                        >
+                          Dark
+                        </button>
+                      </div>
+                    </div>
                   </div>
 
                   <button
@@ -198,17 +255,29 @@ export default function SetupModal({ onStart }: SetupModalProps) {
                   transition={{ duration: 0.35 }}
                 >
                   <h1
-                    className="text-[1.9rem] md:text-[2.15rem] leading-tight font-semibold text-slate-900"
+                    className={`text-[1.9rem] md:text-[2.15rem] leading-tight font-semibold ${
+                      selectedMode === "dark" ? "text-slate-100" : "text-slate-900"
+                    }`}
                     style={{ fontFamily: "var(--font-playfair), serif" }}
                   >
                     One quick thing before we start
                   </h1>
-                  <p className="mt-2 text-sm text-slate-600">
+                  <p className={`mt-2 text-sm ${selectedMode === "dark" ? "text-slate-400" : "text-slate-600"}`}>
                     Increase your volume a little so you do not miss the moment.
                   </p>
 
-                  <div className="mt-6 rounded-xl border border-slate-200/80 bg-white/65 p-5">
-                    <p className="flex items-center justify-center gap-2 text-[0.68rem] uppercase tracking-[0.18em] text-slate-500">
+                  <div
+                    className={`mt-6 rounded-xl border p-5 ${
+                      selectedMode === "dark"
+                        ? "border-white/12 bg-white/6"
+                        : "border-slate-200/80 bg-white/65"
+                    }`}
+                  >
+                    <p
+                      className={`flex items-center justify-center gap-2 text-[0.68rem] uppercase tracking-[0.18em] ${
+                        selectedMode === "dark" ? "text-slate-300" : "text-slate-500"
+                      }`}
+                    >
                       <motion.span
                         animate={{ scale: [1, 1.22, 1], opacity: [0.75, 1, 0.75] }}
                         transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
@@ -223,12 +292,16 @@ export default function SetupModal({ onStart }: SetupModalProps) {
                   <div className="mt-6 flex gap-3">
                     <button
                       onClick={() => setStep("color")}
-                      className="w-1/3 rounded-2xl px-4 py-4 text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
+                      className={`w-1/3 rounded-2xl px-4 py-4 text-sm font-semibold transition-colors ${
+                        selectedMode === "dark"
+                          ? "text-slate-200 bg-white/10 hover:bg-white/15"
+                          : "text-slate-700 bg-slate-100 hover:bg-slate-200"
+                      }`}
                     >
                       Back
                     </button>
                     <button
-                      onClick={() => onStart(selectedColor, audioSrc)}
+                      onClick={() => onStart(selectedColor, audioSrc, selectedMode)}
                       className="w-2/3 rounded-2xl px-6 py-4 text-white text-base font-semibold tracking-[0.08em] transition-all"
                       style={{
                         background: `linear-gradient(135deg, ${selectedColor}, ${selectedColor}d9)`,

@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LyricsPlayer from '@/components/LyricsPlayer';
 import ValentinePages from '@/components/ValentinePages';
@@ -71,6 +71,7 @@ export default function Home() {
   const [accentColor, setAccentColor] = useState('#f43f5e');
   const [audioSrc, setAudioSrc] = useState('/music/lyrics-music.mp3');
   const [hasStarted, setHasStarted] = useState(false);
+  const [themeMode, setThemeMode] = useState<'light' | 'dark'>('light');
   const [showLyricsIntro, setShowLyricsIntro] = useState(false);
   const [showPostLyricsBridge, setShowPostLyricsBridge] = useState(false);
   const [showValentine, setShowValentine] = useState(false);
@@ -126,9 +127,19 @@ export default function Home() {
     valentineAudio.play().catch(() => {});
   };
 
-  const handleSetupStart = (color: string, audio: string) => {
+  useEffect(() => {
+    const root = document.documentElement;
+    if (themeMode === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+  }, [themeMode]);
+
+  const handleSetupStart = (color: string, audio: string, mode: 'light' | 'dark') => {
     setAccentColor(color);
     setAudioSrc(audio);
+    setThemeMode(mode);
     setHasStarted(true);
     setShowLyricsIntro(true);
   };
