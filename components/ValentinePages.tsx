@@ -2,25 +2,32 @@
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Volume2, VolumeX } from 'lucide-react';
 import Page1 from './oluwatomi-pages/Page1';
 import Page2 from './oluwatomi-pages/Page2';
 import Page3 from './oluwatomi-pages/Page3';
-import { Volume2, VolumeX, ChevronUp } from 'lucide-react';
+import ScrollIndicator from './ui/ScrollIndicator';
+import RomanticReveal from './ui/RomanticReveal';
+import Countdown from './ui/Countdown';
 
 interface ValentinePagesProps {
   accentColor: string;
+  name?: string;
 }
 
-type Page = 'question' | 'yes-response' | 'yes-response-message' | 'pre-oluwatomi-message' | 'oluwatomi-page1' | 'oluwatomi-page2' | 'oluwatomi-page3';
+type Page = 'question' | 'yes-response' | 'yes-response-message' | 'post-yes-message' | 'oluwatomi-page1' | 'pre-oluwatomi-message' | 'oluwatomi-page2' | 'oluwatomi-page3' | 'smile-prompt' | 'part2-teaser';
 
 const PAGE_ORDER: Page[] = [
   'question',
   'yes-response',
   'yes-response-message',
-  'pre-oluwatomi-message',
+  'post-yes-message',
   'oluwatomi-page1',
+  'pre-oluwatomi-message',
   'oluwatomi-page2',
-  'oluwatomi-page3'
+  'oluwatomi-page3',
+  'smile-prompt',
+  'part2-teaser'
 ];
 
 const pageVariants = {
@@ -44,71 +51,62 @@ const pageVariants = {
   })
 };
 
-const ScrollHint = ({ onNext, accentColor, delay = 0.8 }: { onNext: () => void; accentColor: string; delay?: number }) => (
-  <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    transition={{ delay, duration: 0.6 }}
-    className="flex justify-center pt-6"
-  >
-    <motion.button
-      whileHover={{ scale: 1.06 }}
-      whileTap={{ scale: 0.94 }}
-      onClick={onNext}
-      animate={{ y: [0, -6, 0] }}
-      transition={{ duration: 1.5, repeat: Infinity }}
-      className="flex flex-col items-center gap-2 group cursor-pointer"
-    >
-      <ChevronUp className="w-5 h-5 transition-colors" style={{ color: accentColor }} />
-      <span className="text-sm font-light tracking-[0.2em] uppercase transition-colors" style={{ color: accentColor }}>
-        Scroll up
-      </span>
-    </motion.button>
-  </motion.div>
-);
+
 
 const NO_TEXT_SEQUENCE = [
   'Are you sure?',
-  'Really Sure?',
+  'Really sure?',
   'Are you positive?',
   'Pookie please',
   'Just think about it',
-  'If you click no again i would be sad',
+  'If you click no again, I will be sad',
   'Well I tried',
   'I will be very sad',
+  'Pretty please?',
+  'One more thought?',
+  "Don't break my heart",
+  'Still no? 🥺',
+  'Give me a chance',
+  'I brought flowers',
+  'I can wait...',
+  'That hurt a little',
+  'Maybe yes this time?',
+  "You're too cute to say no",
+  'Final answer?',
+  'Okay... last try',
+  'Please? just once',
+  "I'm trying my best here",
+  'Come on now',
+  'You are making this hard',
+  'My heart is on the line',
+  'Just one tiny yes',
+  'Be kind to me',
+  'I rehearsed for this',
+  'I even wore my best smile',
+  'No way this is real',
+  'Why you doing this to me?',
+  'You know I will ask again',
+  'This could be our moment',
+  'I can be patient',
+  'Let me spoil you a little',
+  'I promise good vibes only',
+  'Can I get a yes maybe?',
+  'This no is loud',
+  'I heard that... still asking',
+  'You are too adorable to reject me',
+  'Plot twist: you say yes',
+  'We look good together though',
+  'I am not giving up yet',
+  'Just imagine the cute dates',
+  'My heart says try again',
+  'I have snacks too',
+  'I can write you poems',
+  'I will send voice notes',
+  'You are worth the wait',
+  'Can we call that a soft yes?'
 ];
 
-const RomanticReveal = ({ text, baseDelay = 0, onComplete }: { text: string; baseDelay?: number, onComplete?: () => void }) => {
-  const words = text.split(' ')
 
-  useEffect(() => {
-    if (onComplete) {
-      const totalTime = (baseDelay + words.length * 0.1 + 0.8) * 1000
-      const timer = setTimeout(onComplete, totalTime)
-      return () => clearTimeout(timer)
-    }
-  }, [baseDelay, words.length, onComplete])
-
-  return (
-    <motion.div className="flex flex-wrap justify-center gap-x-2">
-      {words.map((word, i) => (
-        <motion.span
-          key={i}
-          initial={{ opacity: 0, filter: 'blur(10px)', y: 10 }}
-          animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
-          transition={{
-            duration: 0.8,
-            delay: baseDelay + (i * 0.1),
-            ease: "easeOut"
-          }}
-          className="inline-block px-1 py-1"
-        >
-          {word}
-        </motion.span>
-      ))}
-    </motion.div>
-  )
-}
 
 const FloatingElement = ({ accentColor }: { accentColor: string }) => {
   const elements = useMemo(() => {
@@ -201,39 +199,105 @@ const ConfettiBurst = ({ accentColor }: { accentColor: string }) => {
   );
 };
 
-export default function ValentinePages({ accentColor }: ValentinePagesProps) {
+
+
+export default function ValentinePages({ accentColor, name = 'love' }: ValentinePagesProps) {
+  const TARGET_MUSIC_VOLUME = 0.4;
+  const START_MUSIC_VOLUME = 0.06;
+  const FADE_IN_DURATION_MS = 2200;
+  const FADE_STEP_MS = 60;
+
   const [currentPage, setCurrentPage] = useState<Page>('question');
   const [noClickCount, setNoClickCount] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
   const [direction, setDirection] = useState(1);
+  const [isYesResponseComplete, setIsYesResponseComplete] = useState(false);
   const [isYesMessageComplete, setIsYesMessageComplete] = useState(false);
+  const [isPostYesMessageComplete, setIsPostYesMessageComplete] = useState(false);
   const [isPreludeMessageComplete, setIsPreludeMessageComplete] = useState(false);
+  const [isPage1Complete, setIsPage1Complete] = useState(false);
+  const [isPage2Complete, setIsPage2Complete] = useState(false);
+  const [isPage3Complete, setIsPage3Complete] = useState(false);
+  const [isSmilePromptComplete, setIsSmilePromptComplete] = useState(false);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const fadeTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const preludeAutoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastNavTimeRef = useRef(0);
   const touchStartYRef = useRef<number | null>(null);
   const wheelAccumRef = useRef(0);
   const wheelLastTimeRef = useRef(0);
+  const daysAfterValentines = useMemo(() => {
+    const now = new Date();
+    const valentines = new Date(now.getFullYear(), 1, 14);
+
+    if (now < valentines) {
+      valentines.setFullYear(valentines.getFullYear() - 1);
+    }
+
+    const diffMs = now.getTime() - valentines.getTime();
+    return Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
+  }, []);
+  const valentinesDayLabel = daysAfterValentines === 1 ? 'day' : 'days';
+
+  const clearFadeTimer = useCallback(() => {
+    if (fadeTimerRef.current) {
+      clearInterval(fadeTimerRef.current);
+      fadeTimerRef.current = null;
+    }
+  }, []);
+
+  const playAudioWithFade = useCallback(async () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    clearFadeTimer();
+    audio.volume = START_MUSIC_VOLUME;
+
+    try {
+      await audio.play();
+      setIsAudioPlaying(true);
+
+      const step = (TARGET_MUSIC_VOLUME - START_MUSIC_VOLUME) / (FADE_IN_DURATION_MS / FADE_STEP_MS);
+      fadeTimerRef.current = setInterval(() => {
+        const activeAudio = audioRef.current;
+        if (!activeAudio || activeAudio.paused) {
+          clearFadeTimer();
+          return;
+        }
+
+        const nextVolume = activeAudio.volume + step;
+        if (nextVolume >= TARGET_MUSIC_VOLUME) {
+          activeAudio.volume = TARGET_MUSIC_VOLUME;
+          clearFadeTimer();
+          return;
+        }
+
+        activeAudio.volume = nextVolume;
+      }, FADE_STEP_MS);
+    } catch (error) {
+      console.error(error);
+    }
+  }, [clearFadeTimer, FADE_IN_DURATION_MS, FADE_STEP_MS, START_MUSIC_VOLUME, TARGET_MUSIC_VOLUME]);
 
   useEffect(() => {
     const audio = new Audio('/music/blue.mp3');
     audio.loop = true;
-    audio.volume = 0.4;
+    audio.volume = TARGET_MUSIC_VOLUME;
     audioRef.current = audio;
     return () => {
+      clearFadeTimer();
       audio.pause();
       audio.src = '';
     };
-  }, []);
+  }, [TARGET_MUSIC_VOLUME, clearFadeTimer]);
 
   useEffect(() => {
     if (!audioRef.current) return;
     if (currentPage === 'question' && !isAudioPlaying) {
-      audioRef.current.play()
-        .then(() => setIsAudioPlaying(true))
-        .catch(console.error);
+      playAudioWithFade();
     }
-  }, [currentPage, isAudioPlaying]);
+  }, [currentPage, isAudioPlaying, playAudioWithFade]);
 
   const handleNavigation = useCallback((dir: 1 | -1) => {
     const now = Date.now();
@@ -241,11 +305,17 @@ export default function ValentinePages({ accentColor }: ValentinePagesProps) {
 
     const currentIndex = PAGE_ORDER.indexOf(currentPage);
     if (currentIndex === -1) return;
+    if (currentPage === 'pre-oluwatomi-message') return;
 
     if (dir === 1) {
       if (currentPage === 'question') return;
+      if (currentPage === 'yes-response' && !isYesResponseComplete) return;
       if (currentPage === 'yes-response-message' && !isYesMessageComplete) return;
-      if (currentPage === 'pre-oluwatomi-message' && !isPreludeMessageComplete) return;
+      if (currentPage === 'post-yes-message' && !isPostYesMessageComplete) return;
+      if (currentPage === 'oluwatomi-page1' && !isPage1Complete) return;
+      if (currentPage === 'oluwatomi-page2' && !isPage2Complete) return;
+      if (currentPage === 'oluwatomi-page3' && !isPage3Complete) return;
+      if (currentPage === 'smile-prompt' && !isSmilePromptComplete) return;
       if (currentIndex >= PAGE_ORDER.length - 1) return;
 
       lastNavTimeRef.current = now;
@@ -257,7 +327,34 @@ export default function ValentinePages({ accentColor }: ValentinePagesProps) {
       setDirection(-1);
       setCurrentPage(PAGE_ORDER[currentIndex - 1]);
     }
-  }, [currentPage, isYesMessageComplete, isPreludeMessageComplete]);
+  }, [currentPage, isYesResponseComplete, isYesMessageComplete, isPostYesMessageComplete, isPage1Complete, isPage2Complete, isPage3Complete, isSmilePromptComplete]);
+
+  useEffect(() => {
+    if (currentPage === 'pre-oluwatomi-message') {
+      setIsPreludeMessageComplete(false);
+    }
+  }, [currentPage]);
+
+  useEffect(() => {
+    if (preludeAutoTimerRef.current) {
+      clearTimeout(preludeAutoTimerRef.current);
+      preludeAutoTimerRef.current = null;
+    }
+
+    if (currentPage !== 'pre-oluwatomi-message' || !isPreludeMessageComplete) return;
+
+    preludeAutoTimerRef.current = setTimeout(() => {
+      setDirection(1);
+      setCurrentPage('oluwatomi-page2');
+    }, 1500);
+
+    return () => {
+      if (preludeAutoTimerRef.current) {
+        clearTimeout(preludeAutoTimerRef.current);
+        preludeAutoTimerRef.current = null;
+      }
+    };
+  }, [currentPage, isPreludeMessageComplete]);
 
   useEffect(() => {
     const handleWheel = (event: WheelEvent) => {
@@ -296,8 +393,8 @@ export default function ValentinePages({ accentColor }: ValentinePagesProps) {
       const delta = touchStartYRef.current - endY;
       touchStartYRef.current = null;
       if (Math.abs(delta) < 30) return;
-      if (delta > 0) handleNavigation(1);
-      else handleNavigation(-1);
+      if (delta > 0) handleNavigation(-1);
+      else handleNavigation(1);
     };
 
     window.addEventListener('wheel', handleWheel, { passive: true });
@@ -325,11 +422,15 @@ export default function ValentinePages({ accentColor }: ValentinePagesProps) {
 
   const toggleMusic = useCallback(() => {
     if (audioRef.current) {
-      if (isAudioPlaying) audioRef.current.pause();
-      else audioRef.current.play().catch(console.error);
-      setIsAudioPlaying(!isAudioPlaying);
+      if (isAudioPlaying) {
+        clearFadeTimer();
+        audioRef.current.pause();
+        setIsAudioPlaying(false);
+      } else {
+        playAudioWithFade();
+      }
     }
-  }, [isAudioPlaying]);
+  }, [clearFadeTimer, isAudioPlaying, playAudioWithFade]);
 
   const currentNoText = noClickCount === 0 ? 'No' : NO_TEXT_SEQUENCE[(noClickCount - 1) % NO_TEXT_SEQUENCE.length];
   return (
@@ -353,7 +454,7 @@ export default function ValentinePages({ accentColor }: ValentinePagesProps) {
             className="fixed inset-0 flex items-center justify-center overflow-hidden"
           >
             <div className="relative z-10 flex flex-col items-center gap-8 text-center px-6">
-              <p className="text-sm tracking-[0.24em] uppercase text-slate-900">For Oluwatomi</p>
+              <p className="text-sm tracking-[0.24em] uppercase text-slate-900">For {name}</p>
               <h1 className="text-6xl md:text-8xl font-great-vibes" style={{ color: accentColor }}>Will you be my Valentine?</h1>
               <div className="flex flex-col items-center gap-4">
                 <motion.button
@@ -403,25 +504,22 @@ export default function ValentinePages({ accentColor }: ValentinePagesProps) {
                 alt="Teddy Bear"
                 className="w-44 h-44 md:w-56 md:h-56 mx-auto rounded-3xl shadow-lg relative z-10"
               />
-              <motion.h1
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.9, delay: 0.24 }}
-                className="text-5xl md:text-6xl font-great-vibes relative z-10"
-                style={{ color: accentColor }}
-              >
-                Knew you would say yes
-              </motion.h1>
-              <motion.p
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.32 }}
-                className="text-lg md:text-2xl text-slate-700 relative z-10"
-              >
-                I am definitely a lucky one.
-              </motion.p>
-              <ScrollHint accentColor={accentColor} onNext={() => handleNavigation(1)} />
+              <div className="text-5xl md:text-6xl font-great-vibes relative z-10" style={{ color: accentColor }}>
+                <RomanticReveal text="Knew you would say yes" baseDelay={0.8} />
+              </div>
+              <div className="text-lg md:text-2xl text-slate-700 font-light italic relative z-10">
+                <RomanticReveal 
+                  text="I am definitely a lucky one." 
+                  baseDelay={2.4} 
+                  onComplete={() => setIsYesResponseComplete(true)}
+                />
+              </div>
             </div>
+            <AnimatePresence>
+              {isYesResponseComplete && (
+                <ScrollIndicator accentColor={accentColor} delay={0.1} onNext={() => handleNavigation(1)} />
+              )}
+            </AnimatePresence>
           </motion.div>
         )}
 
@@ -441,10 +539,10 @@ export default function ValentinePages({ accentColor }: ValentinePagesProps) {
                 initial={{ opacity: 0, y: 24, filter: 'blur(8px)' }}
                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
-                className="text-3xl md:text-5xl text-slate-800 font-light leading-relaxed italic max-w-3xl mx-auto"
+                className="text-3xl md:text-5xl text-slate-800 font-bold leading-relaxed italic max-w-3xl mx-auto"
               >
                 <RomanticReveal
-                  text="I'm so glad we met. You always know how to make me smile and I really appreciate having you around. Happy Valentine's Day, Oluwatomi! 💗"
+                  text="I'm so glad we met. You always know how to make me smile and I really appreciate having you around. Happy Valentine's Day, Tomiwa! 💗"
                   baseDelay={0.5}
                   onComplete={() => setIsYesMessageComplete(true)}
                 />
@@ -452,9 +550,7 @@ export default function ValentinePages({ accentColor }: ValentinePagesProps) {
               <div className="h-24"></div>
               <AnimatePresence>
                 {isYesMessageComplete && (
-                  <div className="absolute left-1/2 -translate-x-1/2 bottom-2 w-full">
-                    <ScrollHint accentColor={accentColor} delay={0.1} onNext={() => handleNavigation(1)} />
-                  </div>
+                  <ScrollIndicator accentColor={accentColor} delay={0.1} onNext={() => handleNavigation(1)} />
                 )}
               </AnimatePresence>
             </div>
@@ -477,26 +573,67 @@ export default function ValentinePages({ accentColor }: ValentinePagesProps) {
                 initial={{ opacity: 0, y: 24, filter: 'blur(8px)' }}
                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
-                className="space-y-6 text-3xl md:text-5xl text-slate-800 font-light leading-relaxed italic max-w-3xl mx-auto"
+                className="space-y-6 text-3xl md:text-5xl text-slate-800 font-bold leading-relaxed italic max-w-3xl mx-auto"
               >
-                <RomanticReveal text="Though it's past valentine" baseDelay={0.25} />
-                <RomanticReveal text="Though it's too soon" baseDelay={1.8} />
+                <RomanticReveal text="Even if Valentine's is over," baseDelay={1.2} />
+                <RomanticReveal text="Even if it's too soon," baseDelay={3.2} />
                 <RomanticReveal
-                  text="Though it might be a feeling"
-                  baseDelay={3.2}
+                  text="Even if it's just a feeling..."
+                  baseDelay={5.2}
                 />
                 <RomanticReveal
                   text="But....."
-                  baseDelay={4.8}
+                  baseDelay={7.2}
                   onComplete={() => setIsPreludeMessageComplete(true)}
                 />
               </motion.div>
               <div className="h-24"></div>
+            </div>
+          </motion.div>
+        )}
+
+        {currentPage === 'post-yes-message' && (
+          <motion.div
+            key="post-yes-message"
+            custom={direction}
+            variants={pageVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
+            className="fixed inset-0 flex items-center justify-center"
+          >
+            <div className="relative z-10 w-full max-w-3xl px-6 text-center">
+              <motion.div
+                initial={{ opacity: 0, y: 24, filter: 'blur(8px)' }}
+                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
+                className="space-y-6 text-3xl md:text-5xl text-slate-800 font-bold leading-relaxed italic max-w-3xl mx-auto"
+              >
+                <RomanticReveal
+                  text={`I know, right? Who does this ${daysAfterValentines} ${valentinesDayLabel} late?`}
+                  baseDelay={0.35}
+                  wordDelay={0.1}
+                  wordDuration={0.8}
+                />
+                <RomanticReveal
+                  text="It felt too soon to ask you on the actual day, but I didn't want to let the moment pass by either."
+                  baseDelay={2.8}
+                  wordDelay={0.1}
+                  wordDuration={0.8}
+                />
+                <RomanticReveal
+                  text="But....."
+                  baseDelay={5.8}
+                  wordDelay={0.1}
+                  wordDuration={0.8}
+                  onComplete={() => setIsPostYesMessageComplete(true)}
+                />
+              </motion.div>
+              <div className="h-24"></div>
               <AnimatePresence>
-                {isPreludeMessageComplete && (
-                  <div className="absolute left-1/2 -translate-x-1/2 bottom-2 w-full">
-                    <ScrollHint accentColor={accentColor} delay={0.1} onNext={() => handleNavigation(1)} />
-                  </div>
+                {isPostYesMessageComplete && (
+                  <ScrollIndicator accentColor={accentColor} delay={0.1} onNext={() => handleNavigation(1)} />
                 )}
               </AnimatePresence>
             </div>
@@ -508,7 +645,9 @@ export default function ValentinePages({ accentColor }: ValentinePagesProps) {
             key="oluwatomi-page1"
             direction={direction}
             accentColor={accentColor}
-            onNext={() => { setDirection(1); setCurrentPage('oluwatomi-page2'); }}
+            name={name}
+            onComplete={() => setIsPage1Complete(true)}
+            onNext={() => { setDirection(1); setCurrentPage('pre-oluwatomi-message'); }}
           />
         )}
 
@@ -517,12 +656,83 @@ export default function ValentinePages({ accentColor }: ValentinePagesProps) {
             key="oluwatomi-page2"
             direction={direction}
             accentColor={accentColor}
+            onComplete={() => setIsPage2Complete(true)}
             onNext={() => { setDirection(1); setCurrentPage('oluwatomi-page3'); }}
           />
         )}
 
         {currentPage === 'oluwatomi-page3' && (
-          <Page3 key="oluwatomi-page3" direction={direction} accentColor={accentColor} />
+          <Page3 
+            key="oluwatomi-page3" 
+            direction={direction} 
+            accentColor={accentColor} 
+            name={name}
+            onComplete={() => setIsPage3Complete(true)}
+            onNext={() => handleNavigation(1)}
+          />
+        )}
+        
+        {currentPage === 'smile-prompt' && (
+          <motion.div
+            key="smile-prompt"
+            custom={direction}
+            variants={pageVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
+            className="fixed inset-0 flex items-center justify-center"
+          >
+            <div className="relative z-10 w-full max-w-4xl px-6 text-center">
+              <motion.div
+                initial={{ opacity: 0, y: 24, filter: 'blur(8px)' }}
+                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                className="text-3xl md:text-5xl text-slate-800 font-bold leading-relaxed italic"
+              >
+                <RomanticReveal 
+                  text="Well, if you want to know what those ***** mean... just come find me and smile 🙂. Don't say a word, just smile and go 😉." 
+                  baseDelay={0.5}
+                  onComplete={() => setIsSmilePromptComplete(true)}
+                />
+              </motion.div>
+              <AnimatePresence>
+                {isSmilePromptComplete && (
+                  <ScrollIndicator accentColor={accentColor} delay={0.1} onNext={() => handleNavigation(1)} />
+                )}
+              </AnimatePresence>
+            </div>
+          </motion.div>
+        )}
+
+        {currentPage === 'part2-teaser' && (
+          <motion.div
+            key="part2-teaser"
+            custom={direction}
+            variants={pageVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}
+            className="fixed inset-0 flex items-center justify-center bg-white/50 backdrop-blur-sm px-6"
+          >
+            <div className="text-center w-full max-w-4xl">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, filter: 'blur(10px)' }}
+                animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+                transition={{ duration: 1, ease: "easeOut" }}
+                className="space-y-4"
+              >
+                <p className="text-5xl md:text-8xl font-great-vibes" style={{ color: accentColor }}>
+                  ...Or just wait for part 2.
+                </p>
+                <p className="text-xs md:text-sm text-slate-500/80">
+                  well you voted for it for Thu, 16th Apri at 21:00
+                </p>
+                <div className="h-px bg-linear-to-r from-transparent via-slate-300 to-transparent w-full mt-12" />
+                <Countdown accentColor={accentColor} />
+              </motion.div>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
 
@@ -530,7 +740,7 @@ export default function ValentinePages({ accentColor }: ValentinePagesProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         onClick={toggleMusic}
-        className="fixed bottom-6 left-6 z-[100] p-3 bg-white/80 backdrop-blur-md rounded-full shadow-lg border"
+        className="fixed bottom-6 left-6 z-100 p-3 bg-white/80 backdrop-blur-md rounded-full shadow-lg border"
         style={{ color: accentColor, borderColor: `${accentColor}66` }}
       >
         {isAudioPlaying ? <Volume2 size={24} /> : <VolumeX size={24} />}

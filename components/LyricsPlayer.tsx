@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
 
@@ -22,6 +22,68 @@ interface LyricsPlayerProps {
 const WORD_DURATION = 0.5;
 const LINE_TRANSITION_TIME = 0.25;
 
+const BackgroundAnimations = ({ accentColor }: { accentColor: string }) => {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+      {/* Primary animated blob */}
+      <motion.div
+        animate={{
+          scale: [1, 1.2, 1],
+          x: ['-10%', '10%', '-10%'],
+          y: ['-10%', '10%', '-10%'],
+        }}
+        transition={{
+          duration: 15,
+          repeat: Infinity,
+          ease: "linear"
+        }}
+        className="absolute -top-[20%] -left-[10%] w-[70vw] h-[70vw] rounded-full blur-[120px] opacity-[0.22]"
+        style={{ background: `radial-gradient(circle, ${accentColor} 0%, transparent 70%)` }}
+      />
+      
+      {/* Secondary animated blob */}
+      <motion.div
+        animate={{
+          scale: [1.2, 1, 1.2],
+          x: ['10%', '-10%', '10%'],
+          y: ['20%', '-5%', '20%'],
+        }}
+        transition={{
+          duration: 20,
+          repeat: Infinity,
+          ease: "linear"
+        }}
+        className="absolute -bottom-[20%] -right-[10%] w-[60vw] h-[60vw] rounded-full blur-[100px] opacity-[0.18]"
+        style={{ background: `radial-gradient(circle, ${accentColor} 0%, transparent 70%)` }}
+      />
+
+      {/* Floating accent particles */}
+      {[...Array(6)].map((_, i) => (
+        <motion.div
+          key={i}
+          initial={{ 
+            x: Math.random() * 100 + '%', 
+            y: Math.random() * 100 + '%',
+            opacity: 0 
+          }}
+          animate={{
+            y: [null, (Math.random() - 0.5) * 200 + 'px'],
+            opacity: [0, 0.15, 0],
+            scale: [0, 1.5, 0]
+          }}
+          transition={{
+            duration: 8 + Math.random() * 10,
+            repeat: Infinity,
+            delay: Math.random() * 5
+          }}
+          className="absolute w-32 h-32 rounded-full blur-3xl"
+          style={{ backgroundColor: accentColor }}
+        />
+      ))}
+    </div>
+  );
+};
+
 export default function LyricsPlayer({
   lyrics,
   accentColor,
@@ -30,7 +92,7 @@ export default function LyricsPlayer({
   onLyricsComplete,
 }: LyricsPlayerProps) {
   const [currentLyricIndex, setCurrentLyricIndex] = useState(0);
-  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const [currentWordIndex, setCurrentWordIndex] = useState(-1);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -39,6 +101,8 @@ export default function LyricsPlayer({
   const audioRef = useRef<HTMLAudioElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const hasAutoplayStartedRef = useRef(false);
+  const hasUserPausedRef = useRef(false);
 
   // Pre-calculate line start times or use provided timestamps
   const lineTimings = useMemo(() => {
@@ -205,8 +269,9 @@ export default function LyricsPlayer({
     };
   }, [isPlaying, audioSrc, lineTimings, lyrics, currentTime, onLyricsComplete]);
 
-  const togglePlayPause = async () => {
+  const togglePlayPause = useCallback(async () => {
     if (isPlaying) {
+      hasUserPausedRef.current = true;
       setIsPlaying(false);
       if (audioRef.current && audioSrc) {
         audioRef.current.pause();
@@ -217,14 +282,18 @@ export default function LyricsPlayer({
     if (audioSrc && audioRef.current) {
       try {
         await audioRef.current.play();
+        hasAutoplayStartedRef.current = true;
+        hasUserPausedRef.current = false;
         setIsPlaying(true);
       } catch (err) {
         console.error('Error playing audio:', err);
       }
     } else {
+      hasAutoplayStartedRef.current = true;
+      hasUserPausedRef.current = false;
       setIsPlaying(true);
     }
-  };
+  }, [audioSrc, isPlaying]);
 
   // Keyboard controls
   useEffect(() => {
@@ -232,6 +301,7 @@ export default function LyricsPlayer({
       // ... (keyboard handler remains same)
       if (e.code === 'Space') {
         e.preventDefault();
+        if (e.repeat) return;
         togglePlayPause();
       } else if (e.code === 'ArrowLeft') {
         e.preventDefault();
@@ -251,23 +321,43 @@ export default function LyricsPlayer({
 
   // Autoplay shortly after entering the lyrics screen.
   useEffect(() => {
-    if (isPlaying || hasCompleted) return;
+    if (isPlaying || hasCompleted || hasAutoplayStartedRef.current || hasUserPausedRef.current) return;
 
-    const timer = setTimeout(async () => {
+    let cancelled = false;
+
+    const startPlayback = async () => {
+      if (
+        cancelled ||
+        isPlaying ||
+        hasCompleted ||
+        hasAutoplayStartedRef.current ||
+        hasUserPausedRef.current
+      ) {
+        return;
+      }
+
       if (audioSrc && audioRef.current) {
         try {
           await audioRef.current.play();
+          if (cancelled) return;
+          hasAutoplayStartedRef.current = true;
           setIsPlaying(true);
         } catch (err) {
           console.error('Autoplay blocked:', err);
         }
       } else {
+        hasAutoplayStartedRef.current = true;
         setIsPlaying(true);
       }
-    }, 500);
+    };
 
-    return () => clearTimeout(timer);
-  }, [audioSrc, isPlaying, hasCompleted]);
+    const autoplayDelayMs = Math.max(0, startDelay * 1000);
+    const timer = setTimeout(startPlayback, autoplayDelayMs);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [audioSrc, isPlaying, hasCompleted, startDelay]);
 
   // Handle volume fade-in
   useEffect(() => {
@@ -320,11 +410,10 @@ export default function LyricsPlayer({
 
   return (
     <div
-      className="relative h-screen flex flex-col overflow-hidden text-slate-900"
-      style={{
-        background: `radial-gradient(circle at 10% 15%, ${accentColor}30 0%, transparent 38%), radial-gradient(circle at 88% 80%, ${accentColor}20 0%, transparent 44%), linear-gradient(to bottom, #ffffff 0%, #f8fafc 60%, #f1f5f9 100%)`,
-      }}
+      className="relative h-screen flex flex-col overflow-hidden text-slate-900 bg-white"
     >
+      <BackgroundAnimations accentColor={accentColor} />
+
       <audio
         ref={audioRef}
         onEnded={() => {
@@ -403,7 +492,7 @@ export default function LyricsPlayer({
       </div>
 
       {/* Bottom Controls Area */}
-      <div className="absolute bottom-0 w-full bg-gradient-to-t from-white via-white/90 to-transparent pt-20 pb-10 px-6 max-w-4xl mx-auto inset-x-0">
+      <div className="absolute bottom-0 w-full pt-20 pb-10 px-6 max-w-4xl mx-auto inset-x-0">
         <div className="max-w-xl mx-auto space-y-6">
           {/* Progress Bar */}
           <div className="w-full h-8 flex items-center cursor-pointer relative group"

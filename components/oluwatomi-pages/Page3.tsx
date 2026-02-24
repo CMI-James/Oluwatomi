@@ -1,6 +1,8 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import ScrollIndicator from '../ui/ScrollIndicator'
 
 const variants = {
   enter: (direction: number) => ({
@@ -17,7 +19,23 @@ const variants = {
   })
 }
 
-export default function Page3({ direction = 1, accentColor }: { direction?: number; accentColor: string }) {
+export default function Page3({ 
+  direction = 1, 
+  accentColor,
+  onComplete,
+  onNext,
+  name
+}: { 
+  direction?: number; 
+  accentColor: string;
+  onComplete?: () => void;
+  onNext?: () => void;
+  name?: string;
+}) {
+  useEffect(() => {
+    onComplete?.();
+  }, [onComplete]);
+
   return (
     <motion.div
       custom={direction}
@@ -35,14 +53,17 @@ export default function Page3({ direction = 1, accentColor }: { direction?: numb
           transition={{ delay: 0.2, duration: 1 }}
           className="space-y-4 mb-10"
         >
-          <h1 className="text-6xl md:text-8xl font-great-vibes drop-shadow-md" style={{ color: accentColor }}>
+          {/* <h1 className="text-6xl md:text-8xl font-great-vibes drop-shadow-md" style={{ color: accentColor }}>
             I’m Falling For You
+          </h1> */}
+           <h1 className="text-6xl md:text-8xl font-great-vibes drop-shadow-md" style={{ color: accentColor }}>
+            I’m **** For You
           </h1>
           <p className="text-5xl md:text-7xl text-slate-800 font-great-vibes">
-            Oluwatomi
+            {name || 'Oluwatomi'}
           </p>
         </motion.div>
-
+        
         <div className="relative mb-12">
           <motion.div
             initial={{ scaleX: 0 }}
@@ -83,11 +104,19 @@ export default function Page3({ direction = 1, accentColor }: { direction?: numb
           <motion.div
             animate={{ scale: [1, 1.05, 1] }}
             transition={{ duration: 2, repeat: Infinity }}
-            className="text-xl md:text-2xl text-slate-600 font-light italic pt-4 leading-loose"
+            className="text-xl md:text-2xl text-slate-600 font-light italic pt-4 leading-loose mb-12"
           >
             You're one of the best parts of my days.
           </motion.div>
         </motion.div>
+        
+        <div className="flex justify-center mt-4">
+          <ScrollIndicator 
+            onNext={() => onNext?.()} 
+            accentColor={accentColor} 
+            delay={2.2} 
+          />
+        </div>
       </div>
     </motion.div>
   )

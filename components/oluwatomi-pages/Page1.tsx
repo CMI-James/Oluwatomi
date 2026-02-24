@@ -1,7 +1,8 @@
 'use client'
 
+import { useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { ChevronUp } from 'lucide-react'
+import ScrollIndicator from '../ui/ScrollIndicator'
 
 const variants = {
   enter: (direction: number) => ({
@@ -18,7 +19,10 @@ const variants = {
   })
 }
 
-export default function Page1({ onNext, direction = 1, accentColor }: { onNext: () => void; direction?: number; accentColor: string }) {
+export default function Page1({ name, onComplete, onNext, direction = 1, accentColor }: { name?: string; onComplete?: () => void; onNext: () => void; direction?: number; accentColor: string }) {
+  useEffect(() => {
+    onComplete?.();
+  }, [onComplete]);
   return (
     <motion.div
       custom={direction}
@@ -34,7 +38,7 @@ export default function Page1({ onNext, direction = 1, accentColor }: { onNext: 
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
           transition={{ delay: 0.2, duration: 0.8 }}
-          className="h-px bg-gradient-to-r from-transparent to-transparent mx-auto w-32"
+          className="h-px bg-linear-to-r from-transparent to-transparent mx-auto w-32"
           style={{ backgroundImage: `linear-gradient(to right, transparent, ${accentColor}, transparent)` }}
         ></motion.div>
 
@@ -45,7 +49,7 @@ export default function Page1({ onNext, direction = 1, accentColor }: { onNext: 
           className="space-y-4"
         >
           <h1 className="text-6xl md:text-8xl font-great-vibes drop-shadow-sm flex items-center justify-center gap-3" style={{ color: accentColor }}>
-            Oluwatomi
+            {name || 'Tomi'}
             <motion.span
               animate={{ scale: [1, 1.15, 1] }}
               transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
@@ -65,28 +69,13 @@ export default function Page1({ onNext, direction = 1, accentColor }: { onNext: 
           </motion.p>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2, duration: 0.8 }}
-          className="flex justify-center pt-8"
-        >
-          <motion.button
-            whileHover={{ scale: 1.06 }}
-            whileTap={{ scale: 0.94 }}
-            onClick={onNext}
-            animate={{ y: [0, -6, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            className="flex flex-col items-center gap-2 group cursor-pointer"
-          >
-            <ChevronUp className="w-5 h-5 transition-colors" style={{ color: accentColor }} />
-            <span className="text-sm font-light tracking-[0.2em] uppercase transition-colors" style={{ color: accentColor }}>
-              Scroll up
-            </span>
-          </motion.button>
-        </motion.div>
-
       </div>
+
+      <ScrollIndicator 
+        onNext={onNext} 
+        accentColor={accentColor} 
+        delay={1.2} 
+      />
     </motion.div>
   )
 }

@@ -2,31 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronUp } from 'lucide-react'
+import ScrollIndicator from '../ui/ScrollIndicator'
+import RomanticReveal from '../ui/RomanticReveal'
 
-const RomanticReveal = ({ text, baseDelay = 0 }: { text: string; baseDelay?: number }) => {
-  const words = text.split(' ')
-
-  return (
-    <motion.div className="flex flex-wrap justify-center gap-x-2">
-      {words.map((word, i) => (
-        <motion.span
-          key={i}
-          initial={{ opacity: 0, filter: 'blur(10px)', y: 10 }}
-          animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
-          transition={{
-            duration: 0.8,
-            delay: baseDelay + (i * 0.1),
-            ease: 'easeOut'
-          }}
-          className="inline-block px-1 py-1"
-        >
-          {word}
-        </motion.span>
-      ))}
-    </motion.div>
-  )
-}
 
 const variants = {
   enter: (direction: number) => ({
@@ -43,9 +21,15 @@ const variants = {
   })
 }
 
-export default function Page2({ onNext, direction = 1, accentColor }: { onNext: () => void; direction?: number; accentColor: string }) {
+export default function Page2({ onComplete, onNext, direction = 1, accentColor }: { onComplete?: () => void; onNext: () => void; direction?: number; accentColor: string }) {
   const [displayedMessages, setDisplayedMessages] = useState(0)
   const [showFinalPrompt, setShowFinalPrompt] = useState(false)
+
+  useEffect(() => {
+    if (showFinalPrompt) {
+      onComplete?.()
+    }
+  }, [showFinalPrompt, onComplete])
 
   const messages = [
     'Every moment with you feels warm and easy.',
@@ -125,27 +109,24 @@ export default function Page2({ onNext, direction = 1, accentColor }: { onNext: 
                   className="space-y-6 text-center"
                 >
                   <p className="text-4xl font-great-vibes" style={{ color: accentColor }}>
-                    I really like you, more than words can say...
+                    I really **** you, more than words can say...
                   </p>
-                  <motion.button
-                    whileHover={{ scale: 1.06 }}
-                    whileTap={{ scale: 0.94 }}
-                    onClick={onNext}
-                    animate={{ y: [0, -6, 0] }}
-                    transition={{ duration: 1.5, repeat: Infinity }}
-                    className="flex flex-col items-center gap-2 group cursor-pointer mx-auto"
-                  >
-                    <ChevronUp className="w-5 h-5 transition-colors" style={{ color: accentColor }} />
-                    <span className="text-sm font-light tracking-[0.2em] uppercase transition-colors" style={{ color: accentColor }}>
-                      Scroll up
-                    </span>
-                  </motion.button>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
         </div>
       </div>
+
+      <AnimatePresence>
+        {showFinalPrompt && (
+          <ScrollIndicator 
+            onNext={onNext} 
+            accentColor={accentColor} 
+            delay={0.6} 
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   )
 }
