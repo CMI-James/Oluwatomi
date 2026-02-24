@@ -281,6 +281,7 @@ export default function LyricsPlayer({
 
     if (audioSrc && audioRef.current) {
       try {
+        audioRef.current.muted = false;
         await audioRef.current.play();
         hasAutoplayStartedRef.current = true;
         hasUserPausedRef.current = false;
@@ -338,6 +339,7 @@ export default function LyricsPlayer({
 
       if (audioSrc && audioRef.current) {
         try {
+          audioRef.current.muted = false;
           await audioRef.current.play();
           if (cancelled) return;
           hasAutoplayStartedRef.current = true;
@@ -353,9 +355,19 @@ export default function LyricsPlayer({
 
     const autoplayDelayMs = Math.max(0, startDelay * 1000);
     const timer = setTimeout(startPlayback, autoplayDelayMs);
+    const handleUserInteraction = () => {
+      void startPlayback();
+    };
+    window.addEventListener('touchstart', handleUserInteraction, { passive: true });
+    window.addEventListener('pointerdown', handleUserInteraction, { passive: true });
+    window.addEventListener('keydown', handleUserInteraction);
+
     return () => {
       cancelled = true;
       clearTimeout(timer);
+      window.removeEventListener('touchstart', handleUserInteraction);
+      window.removeEventListener('pointerdown', handleUserInteraction);
+      window.removeEventListener('keydown', handleUserInteraction);
     };
   }, [audioSrc, isPlaying, hasCompleted, startDelay]);
 

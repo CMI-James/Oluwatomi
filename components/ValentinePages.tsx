@@ -203,7 +203,7 @@ const ConfettiBurst = ({ accentColor }: { accentColor: string }) => {
 
 export default function ValentinePages({ accentColor, name = 'love' }: ValentinePagesProps) {
   const TARGET_MUSIC_VOLUME = 0.4;
-  const START_MUSIC_VOLUME = 0.06;
+  const START_MUSIC_VOLUME = 0.2;
   const FADE_IN_DURATION_MS = 2200;
   const FADE_STEP_MS = 60;
 
@@ -300,6 +300,24 @@ export default function ValentinePages({ accentColor, name = 'love' }: Valentine
     if (currentPage === 'question' && !isAudioPlaying) {
       playAudioWithFade();
     }
+  }, [currentPage, isAudioPlaying, playAudioWithFade]);
+
+  useEffect(() => {
+    if (currentPage !== 'question' || isAudioPlaying) return;
+
+    const retryPlay = () => {
+      playAudioWithFade();
+    };
+
+    window.addEventListener('touchstart', retryPlay, { passive: true });
+    window.addEventListener('pointerdown', retryPlay, { passive: true });
+    window.addEventListener('keydown', retryPlay);
+
+    return () => {
+      window.removeEventListener('touchstart', retryPlay);
+      window.removeEventListener('pointerdown', retryPlay);
+      window.removeEventListener('keydown', retryPlay);
+    };
   }, [currentPage, isAudioPlaying, playAudioWithFade]);
 
   const handleNavigation = useCallback((dir: 1 | -1) => {
