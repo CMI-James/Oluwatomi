@@ -515,7 +515,7 @@ export default function ValentinePages({
             className="fixed inset-0 flex items-center justify-center overflow-hidden"
           >
             <div className="relative z-10 flex flex-col items-center gap-8 text-center px-6">
-              <p className="text-sm tracking-[0.24em] uppercase text-slate-900">For {name}</p>
+              <p className={`text-sm tracking-[0.24em] uppercase ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>For {name}</p>
               <h1 className="text-6xl md:text-8xl font-great-vibes" style={{ color: accentColor }}>Will you be my Valentine?</h1>
               <div className="flex flex-col items-center gap-4">
                 <motion.button
@@ -529,7 +529,7 @@ export default function ValentinePages({
                 </motion.button>
                 <button
                   onClick={handleNo}
-                  className="rounded-full px-8 py-3 text-sm font-medium bg-white/80 border"
+                  className={`rounded-full px-8 py-3 text-sm font-medium border ${isDark ? 'bg-white/10' : 'bg-white/80'}`}
                   style={{ color: accentColor, borderColor: `${accentColor}66` }}
                 >
                   {currentNoText}
@@ -551,7 +551,7 @@ export default function ValentinePages({
             className="fixed inset-0 flex items-center justify-center px-6"
           >
             <div
-              className="relative z-10 text-center space-y-6 bg-white/86 backdrop-blur-xl border rounded-[2.2rem] px-8 py-10 md:px-14 md:py-12 overflow-hidden"
+              className={`relative z-10 text-center space-y-6 backdrop-blur-xl border rounded-[2.2rem] px-8 py-10 md:px-14 md:py-12 overflow-hidden ${isDark ? 'bg-black/45' : 'bg-white/86'}`}
               style={{ borderColor: `${accentColor}44`, boxShadow: `0 36px 110px ${accentColor}33` }}
             >
               <div className="absolute -top-20 -left-14 w-56 h-56 rounded-full blur-[95px] opacity-35" style={{ backgroundColor: accentColor }} />
@@ -568,7 +568,7 @@ export default function ValentinePages({
               <div className="text-5xl md:text-6xl font-great-vibes relative z-10" style={{ color: accentColor }}>
                 <RomanticReveal text="Knew you would say yes" baseDelay={0.8} />
               </div>
-              <div className="text-lg md:text-2xl text-slate-700 font-light italic relative z-10">
+              <div className={`text-lg md:text-2xl font-light italic relative z-10 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                 <RomanticReveal 
                   text="I am definitely a lucky one." 
                   baseDelay={2.4} 
@@ -600,7 +600,7 @@ export default function ValentinePages({
                 initial={{ opacity: 0, y: 24, filter: 'blur(8px)' }}
                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
-                className="text-3xl md:text-5xl text-slate-800 font-bold leading-relaxed italic max-w-3xl mx-auto"
+                className={`text-3xl md:text-5xl font-bold leading-relaxed italic max-w-3xl mx-auto ${isDark ? 'text-slate-100' : 'text-slate-800'}`}
               >
                 <RomanticReveal
                   text="I'm so glad we met. You always know how to make me smile and I really appreciate having you around. Happy Valentine's Day, Tomiwa! 💗"
@@ -634,7 +634,7 @@ export default function ValentinePages({
                 initial={{ opacity: 0, y: 24, filter: 'blur(8px)' }}
                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
-                className="space-y-6 text-3xl md:text-5xl text-slate-800 font-bold leading-relaxed italic max-w-3xl mx-auto"
+                className={`space-y-6 text-3xl md:text-5xl font-bold leading-relaxed italic max-w-3xl mx-auto ${isDark ? 'text-slate-100' : 'text-slate-800'}`}
               >
                 <RomanticReveal text="Even if Valentine's is over," baseDelay={1.2} />
                 <RomanticReveal text="Even if it's too soon," baseDelay={3.2} />
@@ -665,7 +665,7 @@ export default function ValentinePages({
                 initial={{ opacity: 0, y: 24, filter: 'blur(8px)' }}
                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
-                className="space-y-6 text-3xl md:text-5xl text-slate-800 font-bold leading-relaxed italic max-w-3xl mx-auto"
+                className={`space-y-6 text-3xl md:text-5xl font-bold leading-relaxed italic max-w-3xl mx-auto ${isDark ? 'text-slate-100' : 'text-slate-800'}`}
               >
                 <RomanticReveal
                   text={`I know, right? Who does this ${daysAfterValentines} ${valentinesDayLabel} late?`}
@@ -744,7 +744,7 @@ export default function ValentinePages({
               <motion.div
                 initial={{ opacity: 0, y: 24, filter: 'blur(8px)' }}
                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                className="text-3xl md:text-5xl text-slate-800 font-bold leading-relaxed italic"
+                className={`text-3xl md:text-5xl font-bold leading-relaxed italic ${isDark ? 'text-slate-100' : 'text-slate-800'}`}
               >
                 <RomanticReveal 
                   text="Well, if you want to know what those ***** mean... just come find me and smile 🙂. Don't say a word, just smile and go 😉." 
@@ -770,7 +770,7 @@ export default function ValentinePages({
             animate="center"
             exit="exit"
             transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-0 flex items-center justify-center bg-white/50 backdrop-blur-sm px-6"
+            className={`fixed inset-0 flex items-center justify-center backdrop-blur-sm px-6 ${isDark ? 'bg-black/35' : 'bg-white/50'}`}
           >
             <div className="text-center w-full max-w-4xl">
               <motion.div
@@ -782,10 +782,10 @@ export default function ValentinePages({
                 <p className="text-5xl md:text-8xl font-great-vibes" style={{ color: accentColor }}>
                   ...Or just wait for part 2.
                 </p>
-                <p className="text-xs md:text-sm text-slate-500/80">
+                <p className={`text-xs md:text-sm ${isDark ? 'text-slate-400' : 'text-slate-500/80'}`}>
                   well you voted for it for Thu, 16th Apr at 21:00
                 </p>
-                <div className="h-px bg-linear-to-r from-transparent via-slate-300 to-transparent w-full mt-12" />
+                <div className={`h-px bg-linear-to-r from-transparent w-full mt-12 ${isDark ? 'via-slate-600' : 'via-slate-300'} to-transparent`} />
                 <Countdown accentColor={accentColor} />
               </motion.div>
             </div>
@@ -797,7 +797,7 @@ export default function ValentinePages({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         onClick={toggleMusic}
-        className="fixed bottom-6 left-6 z-100 p-3 bg-white/80 backdrop-blur-md rounded-full shadow-lg border"
+        className={`fixed bottom-6 left-6 z-100 p-3 backdrop-blur-md rounded-full shadow-lg border ${isDark ? 'bg-white/10' : 'bg-white/80'}`}
         style={{ color: accentColor, borderColor: `${accentColor}66` }}
       >
         {isAudioPlaying ? <Volume2 size={24} /> : <VolumeX size={24} />}
