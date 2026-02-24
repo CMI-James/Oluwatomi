@@ -22,12 +22,14 @@ const variants = {
 export default function Page3({ 
   direction = 1, 
   accentColor,
+  isDark = false,
   onComplete,
   onNext,
   name
 }: { 
   direction?: number; 
   accentColor: string;
+  isDark?: boolean;
   onComplete?: () => void;
   onNext?: () => void;
   name?: string;
@@ -59,7 +61,7 @@ export default function Page3({
            <h1 className="text-6xl md:text-8xl font-great-vibes drop-shadow-md" style={{ color: accentColor }}>
             I’m **** For You
           </h1>
-          <p className="text-5xl md:text-7xl text-slate-800 font-great-vibes">
+          <p className={`text-5xl md:text-7xl font-great-vibes ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>
             {name || 'Oluwatomi'}
           </p>
         </motion.div>
@@ -104,7 +106,7 @@ export default function Page3({
           <motion.div
             animate={{ scale: [1, 1.05, 1] }}
             transition={{ duration: 2, repeat: Infinity }}
-            className="text-xl md:text-2xl text-slate-600 font-light italic pt-4 leading-loose mb-12"
+            className={`text-xl md:text-2xl font-light italic pt-4 leading-loose mb-12 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}
           >
             You're one of the best parts of my days.
           </motion.div>

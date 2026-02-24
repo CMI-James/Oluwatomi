@@ -19,7 +19,21 @@ const variants = {
   })
 }
 
-export default function Page1({ name, onComplete, onNext, direction = 1, accentColor }: { name?: string; onComplete?: () => void; onNext: () => void; direction?: number; accentColor: string }) {
+export default function Page1({
+  name,
+  onComplete,
+  onNext,
+  direction = 1,
+  accentColor,
+  isDark = false,
+}: {
+  name?: string;
+  onComplete?: () => void;
+  onNext: () => void;
+  direction?: number;
+  accentColor: string;
+  isDark?: boolean;
+}) {
   useEffect(() => {
     onComplete?.();
   }, [onComplete]);
@@ -63,7 +77,7 @@ export default function Page1({ name, onComplete, onNext, direction = 1, accentC
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8, duration: 1 }}
-            className="text-xl md:text-2xl text-slate-700 font-light tracking-wide italic pt-2"
+            className={`text-xl md:text-2xl font-light tracking-wide italic pt-2 ${isDark ? 'text-slate-300' : 'text-slate-700'}`}
           >
             I have something special to share with you
           </motion.p>

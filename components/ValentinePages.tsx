@@ -702,6 +702,7 @@ export default function ValentinePages({
             key="oluwatomi-page1"
             direction={direction}
             accentColor={accentColor}
+            isDark={isDark}
             name={name}
             onComplete={() => setIsPage1Complete(true)}
             onNext={() => { setDirection(1); setCurrentPage('pre-oluwatomi-message'); }}
@@ -713,6 +714,7 @@ export default function ValentinePages({
             key="oluwatomi-page2"
             direction={direction}
             accentColor={accentColor}
+            isDark={isDark}
             onComplete={() => setIsPage2Complete(true)}
             onNext={() => { setDirection(1); setCurrentPage('oluwatomi-page3'); }}
           />
@@ -723,6 +725,7 @@ export default function ValentinePages({
             key="oluwatomi-page3" 
             direction={direction} 
             accentColor={accentColor} 
+            isDark={isDark}
             name={name}
             onComplete={() => setIsPage3Complete(true)}
             onNext={() => handleNavigation(1)}

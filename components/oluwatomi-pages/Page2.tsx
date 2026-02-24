@@ -21,7 +21,19 @@ const variants = {
   })
 }
 
-export default function Page2({ onComplete, onNext, direction = 1, accentColor }: { onComplete?: () => void; onNext: () => void; direction?: number; accentColor: string }) {
+export default function Page2({
+  onComplete,
+  onNext,
+  direction = 1,
+  accentColor,
+  isDark = false,
+}: {
+  onComplete?: () => void;
+  onNext: () => void;
+  direction?: number;
+  accentColor: string;
+  isDark?: boolean;
+}) {
   const [displayedMessages, setDisplayedMessages] = useState(0)
   const [showFinalPrompt, setShowFinalPrompt] = useState(false)
 
@@ -91,7 +103,7 @@ export default function Page2({ onComplete, onNext, direction = 1, accentColor }
                   transition={{ duration: 0.9 }}
                   className="text-center"
                 >
-                  <div className="text-3xl md:text-5xl text-slate-800 font-light leading-relaxed max-w-3xl italic pt-4">
+                  <div className={`text-3xl md:text-5xl font-light leading-relaxed max-w-3xl italic pt-4 ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>
                     <RomanticReveal
                       text={messages[displayedMessages]}
                       baseDelay={0.2}

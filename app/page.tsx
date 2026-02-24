@@ -236,7 +236,7 @@ export default function Home() {
           />
         </motion.div>
       ) : stopAfterLyrics ? (
-        <LyricsStopScreen key="stop" name={enteredName} />
+        <LyricsStopScreen key="stop" name={enteredName} isDark={themeMode === 'dark'} />
       ) : (
         <motion.div
           key="valentine"
