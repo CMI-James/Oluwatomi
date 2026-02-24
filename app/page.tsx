@@ -66,6 +66,9 @@ import PostLyricsBridgeScreen from '@/components/screens/PostLyricsBridgeScreen'
 import LyricsStopScreen from '@/components/screens/LyricsStopScreen';
 
 export default function Home() {
+  const LYRICS_PREWARM_VOLUME = 0.12;
+  const VALENTINE_PREWARM_VOLUME = 0.2;
+
   const [accentColor, setAccentColor] = useState('#f43f5e');
   const [audioSrc, setAudioSrc] = useState('/music/lyrics-music.mp3');
   const [hasStarted, setHasStarted] = useState(false);
@@ -81,16 +84,21 @@ export default function Home() {
 
   const initLyricsAudio = () => {
     if (lyricsAudioRef.current) {
-      lyricsAudioRef.current.volume = 0;
+      lyricsAudioRef.current.defaultMuted = false;
       lyricsAudioRef.current.muted = false;
+      lyricsAudioRef.current.currentTime = 0;
+      lyricsAudioRef.current.volume = LYRICS_PREWARM_VOLUME;
       lyricsAudioRef.current.play().catch(() => {});
     }
   };
 
   const initValentineAudio = () => {
     if (valentineAudioRef.current) {
-      valentineAudioRef.current.volume = 0;
+      valentineAudioRef.current.defaultMuted = false;
       valentineAudioRef.current.muted = false;
+      valentineAudioRef.current.loop = true;
+      valentineAudioRef.current.currentTime = 0;
+      valentineAudioRef.current.volume = VALENTINE_PREWARM_VOLUME;
       valentineAudioRef.current.play().catch(() => {});
     }
   };
@@ -138,8 +146,8 @@ export default function Home() {
 
   return (
     <>
-      <audio ref={lyricsAudioRef} src={audioSrc} preload="auto" className="hidden" />
-      <audio ref={valentineAudioRef} src="/music/blue.mp3" preload="auto" loop className="hidden" />
+      <audio ref={lyricsAudioRef} src={audioSrc} preload="auto" playsInline className="hidden" />
+      <audio ref={valentineAudioRef} src="/music/blue.mp3" preload="auto" playsInline loop className="hidden" />
       <AnimatePresence mode="wait">
       {!nameAccepted ? (
         <NameGate onSubmit={handleNameSubmit} />
@@ -184,7 +192,7 @@ export default function Home() {
             accentColor={accentColor}
             audioSrc={audioSrc}
             initialAudio={lyricsAudioRef.current}
-            startDelay={0.2}
+            startDelay={2}
             onLyricsComplete={handleLyricsComplete}
           />
         </motion.div>

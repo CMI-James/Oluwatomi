@@ -109,6 +109,9 @@ export default function LyricsPlayer({
       initialAudio.muted = false;
       initialAudio.currentTime = 0; // Rewind the silently prestarted audio
       audioRef.current = initialAudio;
+      const alreadyPlaying = !initialAudio.paused;
+      hasAutoplayStartedRef.current = alreadyPlaying;
+      setIsPlaying(alreadyPlaying);
     }
   }, [initialAudio]);
 
@@ -350,6 +353,11 @@ export default function LyricsPlayer({
   // Autoplay shortly after entering the lyrics screen.
   useEffect(() => {
     if (isPlaying || hasCompleted || hasAutoplayStartedRef.current || hasUserPausedRef.current) return;
+    if (audioRef.current && !audioRef.current.paused) {
+      hasAutoplayStartedRef.current = true;
+      setIsPlaying(true);
+      return;
+    }
 
     let cancelled = false;
 
