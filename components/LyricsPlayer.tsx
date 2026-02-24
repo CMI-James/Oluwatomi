@@ -16,6 +16,7 @@ interface LyricsPlayerProps {
   accentColor: string;
   audioSrc?: string;
   initialAudio?: HTMLAudioElement | null;
+  autoStart?: boolean;
   startDelay?: number;
   onLyricsComplete?: () => void;
 }
@@ -90,6 +91,7 @@ export default function LyricsPlayer({
   accentColor,
   audioSrc,
   initialAudio = null,
+  autoStart = true,
   startDelay = 0,
   onLyricsComplete,
 }: LyricsPlayerProps) {
@@ -357,6 +359,7 @@ export default function LyricsPlayer({
 
   // Autoplay shortly after entering the lyrics screen.
   useEffect(() => {
+    if (!autoStart) return;
     if (isPlaying || hasCompleted || hasAutoplayStartedRef.current || hasUserPausedRef.current) return;
     if (audioRef.current && !audioRef.current.paused) {
       hasAutoplayStartedRef.current = true;
@@ -413,7 +416,7 @@ export default function LyricsPlayer({
       window.removeEventListener('pointerdown', handleUserInteraction);
       window.removeEventListener('keydown', handleUserInteraction);
     };
-  }, [audioSrc, isPlaying, hasCompleted, startDelay]);
+  }, [audioSrc, autoStart, isPlaying, hasCompleted, startDelay]);
 
   // Handle volume fade-in
   useEffect(() => {

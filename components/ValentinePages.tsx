@@ -14,6 +14,7 @@ interface ValentinePagesProps {
   accentColor: string;
   name?: string;
   initialAudio?: HTMLAudioElement | null;
+  autoStartAudio?: boolean;
 }
 
 type Page = 'question' | 'yes-response' | 'yes-response-message' | 'post-yes-message' | 'oluwatomi-page1' | 'pre-oluwatomi-message' | 'oluwatomi-page2' | 'oluwatomi-page3' | 'smile-prompt' | 'part2-teaser';
@@ -202,7 +203,12 @@ const ConfettiBurst = ({ accentColor }: { accentColor: string }) => {
 
 
 
-export default function ValentinePages({ accentColor, name = 'love', initialAudio = null }: ValentinePagesProps) {
+export default function ValentinePages({
+  accentColor,
+  name = 'love',
+  initialAudio = null,
+  autoStartAudio = true,
+}: ValentinePagesProps) {
   const TARGET_MUSIC_VOLUME = 0.4;
   const START_MUSIC_VOLUME = 0.2;
   const FADE_IN_DURATION_MS = 2200;
@@ -320,13 +326,15 @@ export default function ValentinePages({ accentColor, name = 'love', initialAudi
   }, [TARGET_MUSIC_VOLUME, clearFadeTimer, initialAudio]);
 
   useEffect(() => {
+    if (!autoStartAudio) return;
     if (!audioRef.current) return;
     if (currentPage === 'question' && !isAudioPlaying) {
       playAudioWithFade();
     }
-  }, [currentPage, isAudioPlaying, playAudioWithFade]);
+  }, [autoStartAudio, currentPage, isAudioPlaying, playAudioWithFade]);
 
   useEffect(() => {
+    if (!autoStartAudio) return;
     if (currentPage !== 'question' || isAudioPlaying) return;
 
     const retryPlay = () => {
@@ -346,7 +354,7 @@ export default function ValentinePages({ accentColor, name = 'love', initialAudi
       window.removeEventListener('pointerdown', retryPlay);
       window.removeEventListener('keydown', retryPlay);
     };
-  }, [currentPage, isAudioPlaying, playAudioWithFade]);
+  }, [autoStartAudio, currentPage, isAudioPlaying, playAudioWithFade]);
 
   const handleNavigation = useCallback((dir: 1 | -1) => {
     const now = Date.now();

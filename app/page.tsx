@@ -1,8 +1,7 @@
 'use client';
 
-import { FormEvent, useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronUp } from 'lucide-react';
 import LyricsPlayer from '@/components/LyricsPlayer';
 import ValentinePages from '@/components/ValentinePages';
 import SetupModal from '@/components/SetupModal';
@@ -61,6 +60,7 @@ const YOU_CANT_FOOL_ME_NAMES = new Set([
 ]);
 
 import NameGate from '@/components/screens/NameGate';
+import AudioEnableScreen from '@/components/screens/AudioEnableScreen';
 import LyricsIntroScreen from '@/components/screens/LyricsIntroScreen';
 import PostLyricsBridgeScreen from '@/components/screens/PostLyricsBridgeScreen';
 import LyricsStopScreen from '@/components/screens/LyricsStopScreen';
@@ -78,13 +78,14 @@ export default function Home() {
   const [stopAfterLyrics, setStopAfterLyrics] = useState(false);
   const [accessMode, setAccessMode] = useState<AccessMode>(null);
   const [nameAccepted, setNameAccepted] = useState(false);
+  const [showAudioEnableScreen, setShowAudioEnableScreen] = useState(false);
   const [enteredName, setEnteredName] = useState('');
   const lyricsAudioRef = useRef<HTMLAudioElement | null>(null);
   const valentineAudioRef = useRef<HTMLAudioElement | null>(null);
   const lastLyricsStartAtRef = useRef(0);
   const lastValentineStartAtRef = useRef(0);
 
-  const primeAudioFromTap = (audio: HTMLAudioElement | null) => {
+  const primeAudioFromTap = async (audio: HTMLAudioElement | null) => {
     if (!audio) return;
 
     const previousMuted = audio.muted;
@@ -112,7 +113,7 @@ export default function Home() {
       return;
     }
 
-    playPromise
+    await playPromise
       .then(() => {
         audio.pause();
       })
@@ -166,14 +167,20 @@ export default function Home() {
   };
 
   const handleSetupStart = (color: string, audio: string) => {
-    // Prime both audio elements on the explicit "Open" tap for mobile browsers.
-    primeAudioFromTap(lyricsAudioRef.current);
-    primeAudioFromTap(valentineAudioRef.current);
-
     setAccentColor(color);
     setAudioSrc(audio);
-    setHasStarted(true);
-    setShowLyricsIntro(true);
+    setShowAudioEnableScreen(true);
+  };
+
+  const handleEnableAudio = () => {
+    void Promise.allSettled([
+      primeAudioFromTap(lyricsAudioRef.current),
+      primeAudioFromTap(valentineAudioRef.current),
+    ]).finally(() => {
+      setShowAudioEnableScreen(false);
+      setHasStarted(true);
+      setShowLyricsIntro(true);
+    });
   };
 
   const handleNameSubmit = (name: string) => {
@@ -223,6 +230,12 @@ export default function Home() {
       <AnimatePresence mode="wait">
       {!nameAccepted ? (
         <NameGate onSubmit={handleNameSubmit} />
+      ) : showAudioEnableScreen ? (
+        <AudioEnableScreen
+          key="audio-enable"
+          accentColor={accentColor}
+          onEnable={handleEnableAudio}
+        />
       ) : !hasStarted ? (
         <SetupModal key="setup" onStart={handleSetupStart} />
       ) : showLyricsIntro ? (
@@ -237,6 +250,7 @@ export default function Home() {
           onBack={() => {
             setShowLyricsIntro(false);
             setHasStarted(false);
+            setShowAudioEnableScreen(false);
           }}
         />
       ) : showPostLyricsBridge ? (
@@ -264,6 +278,7 @@ export default function Home() {
             accentColor={accentColor}
             audioSrc={audioSrc}
             initialAudio={lyricsAudioRef.current}
+            autoStart={false}
             startDelay={2}
             onLyricsComplete={handleLyricsComplete}
           />
@@ -283,6 +298,7 @@ export default function Home() {
             accentColor={accentColor}
             name={enteredName || 'love'}
             initialAudio={valentineAudioRef.current}
+            autoStartAudio={false}
           />
         </motion.div>
       )}
