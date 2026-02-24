@@ -193,6 +193,23 @@ export default function Home() {
     }
   };
 
+  const handleReturnToSetup = () => {
+    if (lyricsAudioRef.current) {
+      lyricsAudioRef.current.pause();
+      lyricsAudioRef.current.currentTime = 0;
+    }
+    if (valentineAudioRef.current) {
+      valentineAudioRef.current.pause();
+      valentineAudioRef.current.currentTime = 0;
+    }
+
+    setShowValentine(false);
+    setShowPostLyricsBridge(false);
+    setShowLyricsIntro(false);
+    setStopAfterLyrics(false);
+    setHasStarted(false);
+  };
+
   return (
     <>
       <audio ref={lyricsAudioRef} src={audioSrc} preload="auto" playsInline className="hidden" />
@@ -261,6 +278,7 @@ export default function Home() {
             initialAudio={valentineAudioRef.current}
             isDark={themeMode === 'dark'}
             autoStartAudio={false}
+            onReturnToSetup={handleReturnToSetup}
           />
         </motion.div>
       )}

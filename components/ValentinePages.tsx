@@ -16,6 +16,7 @@ interface ValentinePagesProps {
   initialAudio?: HTMLAudioElement | null;
   isDark?: boolean;
   autoStartAudio?: boolean;
+  onReturnToSetup?: () => void;
 }
 
 type Page = 'question' | 'yes-response' | 'yes-response-message' | 'post-yes-message' | 'oluwatomi-page1' | 'pre-oluwatomi-message' | 'oluwatomi-page2' | 'oluwatomi-page3' | 'smile-prompt' | 'part2-teaser';
@@ -210,6 +211,7 @@ export default function ValentinePages({
   initialAudio = null,
   isDark = false,
   autoStartAudio = true,
+  onReturnToSetup,
 }: ValentinePagesProps) {
   const TARGET_MUSIC_VOLUME = 0.4;
   const START_MUSIC_VOLUME = 0.2;
@@ -817,6 +819,19 @@ export default function ValentinePages({
                   }}
                 >
                   Restart
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={onReturnToSetup}
+                  className="mt-3 rounded-full px-8 py-3 text-sm font-semibold border"
+                  style={{
+                    color: accentColor,
+                    borderColor: `${accentColor}66`,
+                    backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.75)',
+                  }}
+                >
+                  Choose Color Again
                 </motion.button>
               </motion.div>
             </div>
