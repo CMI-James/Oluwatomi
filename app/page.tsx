@@ -77,6 +77,19 @@ export default function Home() {
   const [nameAccepted, setNameAccepted] = useState(false);
   const [enteredName, setEnteredName] = useState('');
 
+  useEffect(() => {
+    const gifsToPreload = [
+      '/images/i-am-familiar-with-your-game.gif',
+      '/video/oluwatomi/heart-sticker-left.gif',
+      '/video/oluwatomi/heart-sticker-right.gif',
+      '/video/teddy-bear.gif'
+    ];
+    gifsToPreload.forEach(src => {
+      const img = new window.Image();
+      img.src = src;
+    });
+  }, []);
+
   const handleSetupStart = (color: string, audio: string) => {
     setAccentColor(color);
     setAudioSrc(audio);

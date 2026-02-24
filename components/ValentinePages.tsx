@@ -273,10 +273,11 @@ export default function ValentinePages({ accentColor, name = 'love' }: Valentine
           return;
         }
 
-        activeAudio.volume = nextVolume;
+      activeAudio.volume = nextVolume;
       }, FADE_STEP_MS);
     } catch (error) {
-      console.error(error);
+      console.error('Autoplay blocked by browser:', error);
+      setIsAudioPlaying(false);
     }
   }, [clearFadeTimer, FADE_IN_DURATION_MS, FADE_STEP_MS, START_MUSIC_VOLUME, TARGET_MUSIC_VOLUME]);
 
@@ -300,6 +301,7 @@ export default function ValentinePages({ accentColor, name = 'love' }: Valentine
   }, [currentPage, isAudioPlaying, playAudioWithFade]);
 
   const handleNavigation = useCallback((dir: 1 | -1) => {
+    if (!isAudioPlaying) playAudioWithFade();
     const now = Date.now();
     if (now - lastNavTimeRef.current < 1050) return;
 
@@ -393,8 +395,8 @@ export default function ValentinePages({ accentColor, name = 'love' }: Valentine
       const delta = touchStartYRef.current - endY;
       touchStartYRef.current = null;
       if (Math.abs(delta) < 30) return;
-      if (delta > 0) handleNavigation(-1);
-      else handleNavigation(1);
+      if (delta > 0) handleNavigation(1);
+      else handleNavigation(-1);
     };
 
     window.addEventListener('wheel', handleWheel, { passive: true });
@@ -411,14 +413,16 @@ export default function ValentinePages({ accentColor, name = 'love' }: Valentine
   }, [handleNavigation]);
 
   const handleYes = useCallback(() => {
+    if (!isAudioPlaying) playAudioWithFade();
     setShowConfetti(true);
     setTimeout(() => setCurrentPage('yes-response'), 300);
     setTimeout(() => setShowConfetti(false), 2600);
-  }, []);
+  }, [isAudioPlaying, playAudioWithFade]);
 
   const handleNo = useCallback(() => {
+    if (!isAudioPlaying) playAudioWithFade();
     setNoClickCount(prev => prev + 1);
-  }, []);
+  }, [isAudioPlaying, playAudioWithFade]);
 
   const toggleMusic = useCallback(() => {
     if (audioRef.current) {
