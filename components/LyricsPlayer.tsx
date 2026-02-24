@@ -107,6 +107,7 @@ export default function LyricsPlayer({
     if (initialAudio) {
       initialAudio.defaultMuted = false;
       initialAudio.muted = false;
+      initialAudio.currentTime = 0; // Rewind the silently prestarted audio
       audioRef.current = initialAudio;
     }
   }, [initialAudio]);

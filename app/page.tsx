@@ -86,10 +86,7 @@ export default function Home() {
         lAudio.defaultMuted = false;
         lAudio.muted = false;
         lAudio.volume = 0;
-        lAudio.play().then(() => {
-          lAudio.pause();
-          lAudio.currentTime = 0;
-        }).catch(() => {});
+        lAudio.play().catch(() => {});
         lyricsAudioRef.current = lAudio;
       } catch (e) {}
     }
@@ -103,10 +100,7 @@ export default function Home() {
         vAudio.defaultMuted = false;
         vAudio.muted = false;
         vAudio.volume = 0;
-        vAudio.play().then(() => {
-          vAudio.pause();
-          vAudio.currentTime = 0;
-        }).catch(() => {});
+        vAudio.play().catch(() => {});
         valentineAudioRef.current = vAudio;
       } catch (e) {}
     }

@@ -58,7 +58,7 @@ export default function SetupModal({ onStart }: SetupModalProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.7 }}
+      transition={{ duration: 0.4 }}
       className="fixed inset-0 flex items-center justify-center z-50 overflow-hidden"
       style={{
         background: `
@@ -76,8 +76,10 @@ export default function SetupModal({ onStart }: SetupModalProps) {
           opacity: [0.22, 0.35, 0.22],
         }}
         transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-[-8%] right-[-6%] w-[45vw] h-[45vw] max-w-[430px] max-h-[430px] rounded-full blur-[110px] pointer-events-none"
-        style={{ backgroundColor: selectedColor }}
+        className="absolute top-[-8%] right-[-6%] w-[45vw] h-[45vw] max-w-[430px] max-h-[430px] rounded-full pointer-events-none"
+        style={{ 
+          background: `radial-gradient(circle, ${selectedColor} 0%, transparent 70%)` 
+        }}
       />
       <motion.div
         animate={{
@@ -90,8 +92,10 @@ export default function SetupModal({ onStart }: SetupModalProps) {
           ease: "easeInOut",
           delay: 1.4,
         }}
-        className="absolute bottom-[-10%] left-[-8%] w-[42vw] h-[42vw] max-w-[360px] max-h-[360px] rounded-full blur-[100px] pointer-events-none"
-        style={{ backgroundColor: selectedColor }}
+        className="absolute bottom-[-10%] left-[-8%] w-[42vw] h-[42vw] max-w-[360px] max-h-[360px] rounded-full pointer-events-none"
+        style={{ 
+          background: `radial-gradient(circle, ${selectedColor} 0%, transparent 70%)` 
+        }}
       />
       <motion.div
         animate={{ scale: [1, 1.18, 1], opacity: [0.08, 0.14, 0.08] }}
@@ -101,14 +105,16 @@ export default function SetupModal({ onStart }: SetupModalProps) {
           ease: "easeInOut",
           delay: 2.8,
         }}
-        className="absolute top-[38%] left-[58%] w-28 h-28 rounded-full blur-[78px] pointer-events-none"
-        style={{ backgroundColor: selectedColor }}
+        className="absolute top-[38%] left-[58%] w-28 h-28 rounded-full pointer-events-none"
+        style={{ 
+          background: `radial-gradient(circle, ${selectedColor} 0%, transparent 70%)` 
+        }}
       />
 
       <motion.div
         initial={{ scale: 0.92, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, type: "spring", damping: 24, stiffness: 120 }}
+        transition={{ duration: 0.4, type: "spring", damping: 24, stiffness: 120 }}
         className="relative z-10 max-w-[30rem] w-full mx-4"
       >
         <div
@@ -123,12 +129,12 @@ export default function SetupModal({ onStart }: SetupModalProps) {
         >
           <div className="absolute inset-0 bg-gradient-to-br from-white/70 via-white/35 to-white/5 pointer-events-none" />
           <div
-            className="absolute -top-20 -right-12 h-52 w-52 rounded-full blur-[80px] pointer-events-none"
-            style={{ backgroundColor: `${selectedColor}35` }}
+            className="absolute -top-20 -right-12 h-52 w-52 rounded-full pointer-events-none"
+            style={{ background: `radial-gradient(circle, ${selectedColor}35 0%, transparent 70%)` }}
           />
           <div
-            className="absolute -bottom-20 -left-12 h-52 w-52 rounded-full blur-[90px] pointer-events-none"
-            style={{ backgroundColor: `${selectedColor}25` }}
+            className="absolute -bottom-20 -left-12 h-52 w-52 rounded-full pointer-events-none"
+            style={{ background: `radial-gradient(circle, ${selectedColor}25 0%, transparent 70%)` }}
           />
 
           <div className="relative z-10">

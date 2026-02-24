@@ -292,6 +292,7 @@ export default function ValentinePages({ accentColor, name = 'love', initialAudi
       initialAudio.loop = true;
       initialAudio.defaultMuted = false;
       initialAudio.muted = false;
+      initialAudio.currentTime = 0; // Rewind the silently prestarted audio
       audioRef.current = initialAudio;
       setIsAudioPlaying(!initialAudio.paused);
       return () => {
