@@ -73,8 +73,8 @@ export default function ScrollIndicator({
       const delta = touchStartYRef.current - endY;
       touchStartYRef.current = null;
       if (Math.abs(delta) < 28) return;
-      if (delta > 0) triggerNext();
-      else triggerPrevious();
+      if (delta > 0) triggerPrevious();
+      else triggerNext();
     };
 
     window.addEventListener('keydown', handleKeyDown);

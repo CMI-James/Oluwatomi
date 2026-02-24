@@ -252,6 +252,7 @@ export default function ValentinePages({ accentColor, name = 'love' }: Valentine
     if (!audio) return;
 
     clearFadeTimer();
+    audio.muted = false;
     audio.volume = START_MUSIC_VOLUME;
 
     try {
@@ -273,17 +274,18 @@ export default function ValentinePages({ accentColor, name = 'love' }: Valentine
           return;
         }
 
-      activeAudio.volume = nextVolume;
+        activeAudio.volume = nextVolume;
       }, FADE_STEP_MS);
     } catch (error) {
-      console.error('Autoplay blocked by browser:', error);
-      setIsAudioPlaying(false);
+      console.error(error);
     }
   }, [clearFadeTimer, FADE_IN_DURATION_MS, FADE_STEP_MS, START_MUSIC_VOLUME, TARGET_MUSIC_VOLUME]);
 
   useEffect(() => {
     const audio = new Audio('/music/blue.mp3');
     audio.loop = true;
+    audio.defaultMuted = false;
+    audio.muted = false;
     audio.volume = TARGET_MUSIC_VOLUME;
     audioRef.current = audio;
     return () => {
@@ -301,7 +303,6 @@ export default function ValentinePages({ accentColor, name = 'love' }: Valentine
   }, [currentPage, isAudioPlaying, playAudioWithFade]);
 
   const handleNavigation = useCallback((dir: 1 | -1) => {
-    if (!isAudioPlaying) playAudioWithFade();
     const now = Date.now();
     if (now - lastNavTimeRef.current < 1050) return;
 
@@ -413,16 +414,14 @@ export default function ValentinePages({ accentColor, name = 'love' }: Valentine
   }, [handleNavigation]);
 
   const handleYes = useCallback(() => {
-    if (!isAudioPlaying) playAudioWithFade();
     setShowConfetti(true);
     setTimeout(() => setCurrentPage('yes-response'), 300);
     setTimeout(() => setShowConfetti(false), 2600);
-  }, [isAudioPlaying, playAudioWithFade]);
+  }, []);
 
   const handleNo = useCallback(() => {
-    if (!isAudioPlaying) playAudioWithFade();
     setNoClickCount(prev => prev + 1);
-  }, [isAudioPlaying, playAudioWithFade]);
+  }, []);
 
   const toggleMusic = useCallback(() => {
     if (audioRef.current) {
