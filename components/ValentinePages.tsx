@@ -14,6 +14,7 @@ interface ValentinePagesProps {
   accentColor: string;
   name?: string;
   initialAudio?: HTMLAudioElement | null;
+  isDark?: boolean;
   autoStartAudio?: boolean;
 }
 
@@ -207,6 +208,7 @@ export default function ValentinePages({
   accentColor,
   name = 'love',
   initialAudio = null,
+  isDark = false,
   autoStartAudio = true,
 }: ValentinePagesProps) {
   const TARGET_MUSIC_VOLUME = 0.4;
@@ -494,7 +496,9 @@ export default function ValentinePages({
     <div
       className="fixed inset-0 overflow-hidden"
       style={{
-        background: `radial-gradient(circle at 12% 12%, ${accentColor}30 0%, transparent 42%), radial-gradient(circle at 88% 85%, ${accentColor}18 0%, transparent 46%), linear-gradient(180deg, #ffffff 0%, #fcfcfd 45%, #f7f8fa 100%)`,
+        background: isDark
+          ? `radial-gradient(circle at 12% 12%, ${accentColor}36 0%, transparent 42%), radial-gradient(circle at 88% 85%, ${accentColor}20 0%, transparent 46%), linear-gradient(180deg, #07090d 0%, #0b1018 45%, #0f141d 100%)`
+          : `radial-gradient(circle at 12% 12%, ${accentColor}30 0%, transparent 42%), radial-gradient(circle at 88% 85%, ${accentColor}18 0%, transparent 46%), linear-gradient(180deg, #ffffff 0%, #fcfcfd 45%, #f7f8fa 100%)`,
       }}
     >
       {showConfetti && <ConfettiBurst accentColor={accentColor} />}

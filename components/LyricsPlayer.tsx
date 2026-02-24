@@ -16,6 +16,7 @@ interface LyricsPlayerProps {
   accentColor: string;
   audioSrc?: string;
   initialAudio?: HTMLAudioElement | null;
+  isDark?: boolean;
   autoStart?: boolean;
   startDelay?: number;
   onLyricsComplete?: () => void;
@@ -91,6 +92,7 @@ export default function LyricsPlayer({
   accentColor,
   audioSrc,
   initialAudio = null,
+  isDark = false,
   autoStart = true,
   startDelay = 0,
   onLyricsComplete,
@@ -470,7 +472,7 @@ export default function LyricsPlayer({
 
   return (
     <div
-      className="relative h-screen flex flex-col overflow-hidden text-slate-900 bg-white"
+      className={`relative h-screen flex flex-col overflow-hidden ${isDark ? 'text-slate-100 bg-slate-950' : 'text-slate-900 bg-white'}`}
     >
       <BackgroundAnimations accentColor={accentColor} />
 

@@ -198,6 +198,7 @@ export default function Home() {
           key="lyrics-intro"
           name={enteredName || 'love'}
           accentColor={accentColor}
+          isDark={themeMode === 'dark'}
           onContinue={() => {
             initLyricsAudio();
             setShowLyricsIntro(false);
@@ -208,6 +209,7 @@ export default function Home() {
           key="post-lyrics-bridge"
           name={enteredName || 'love'}
           accentColor={accentColor}
+          isDark={themeMode === 'dark'}
           onContinue={() => {
             initValentineAudio();
             setShowPostLyricsBridge(false);
@@ -227,6 +229,7 @@ export default function Home() {
             accentColor={accentColor}
             audioSrc={audioSrc}
             initialAudio={lyricsAudioRef.current}
+            isDark={themeMode === 'dark'}
             autoStart={false}
             startDelay={2}
             onLyricsComplete={handleLyricsComplete}
@@ -247,6 +250,7 @@ export default function Home() {
             accentColor={accentColor}
             name={enteredName || 'love'}
             initialAudio={valentineAudioRef.current}
+            isDark={themeMode === 'dark'}
             autoStartAudio={false}
           />
         </motion.div>

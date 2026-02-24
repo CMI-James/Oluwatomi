@@ -7,12 +7,14 @@ import RomanticReveal from '../ui/RomanticReveal';
 interface PostLyricsBridgeScreenProps {
   name: string;
   accentColor: string;
+  isDark?: boolean;
   onContinue: () => void;
 }
 
 export default function PostLyricsBridgeScreen({
   name,
   accentColor,
+  isDark = false,
   onContinue,
 }: PostLyricsBridgeScreenProps) {
   const [showQuestionLine, setShowQuestionLine] = useState(false);
@@ -42,12 +44,15 @@ export default function PostLyricsBridgeScreen({
       transition={{ duration: 1.35, ease: [0.22, 1, 0.36, 1] }}
       className="fixed inset-0 flex items-center justify-center px-6"
       style={{
-        background:
-          'radial-gradient(circle at 16% 18%, rgba(244,63,94,.16) 0%, transparent 42%), radial-gradient(circle at 84% 84%, rgba(59,130,246,.12) 0%, transparent 44%), linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
+        background: isDark
+          ? 'radial-gradient(circle at 16% 18%, rgba(244,63,94,.2) 0%, transparent 42%), radial-gradient(circle at 84% 84%, rgba(59,130,246,.12) 0%, transparent 44%), linear-gradient(180deg, #06080d 0%, #0b0f16 100%)'
+          : 'radial-gradient(circle at 16% 18%, rgba(244,63,94,.16) 0%, transparent 42%), radial-gradient(circle at 84% 84%, rgba(59,130,246,.12) 0%, transparent 44%), linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
       }}
     >
       <div
-        className="max-w-2xl w-full h-[30rem] md:h-[33rem] rounded-4xl border bg-white/88 backdrop-blur-xl p-8 md:p-11 text-center shadow-[0_24px_80px_rgba(15,23,42,0.10)] flex flex-col justify-center"
+        className={`max-w-2xl w-full h-[30rem] md:h-[33rem] rounded-4xl border backdrop-blur-xl p-8 md:p-11 text-center shadow-[0_24px_80px_rgba(15,23,42,0.10)] flex flex-col justify-center ${
+          isDark ? 'bg-black/45' : 'bg-white/88'
+        }`}
         style={{ borderColor: `${accentColor}33` }}
       >
         <motion.p
@@ -68,7 +73,7 @@ export default function PostLyricsBridgeScreen({
                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 exit={{ opacity: 0, y: -8, filter: 'blur(8px)' }}
                 transition={{ duration: 0.75 }}
-                className="text-3xl md:text-4xl leading-snug text-slate-900 font-semibold font-fraunces"
+                className={`text-3xl md:text-4xl leading-snug font-semibold font-fraunces ${isDark ? 'text-slate-100' : 'text-slate-900'}`}
               >
                 <RomanticReveal text="You weren't satisfied?" baseDelay={0.08} />
               </motion.p>
@@ -82,7 +87,7 @@ export default function PostLyricsBridgeScreen({
                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 exit={{ opacity: 0, y: -8, filter: 'blur(8px)' }}
                 transition={{ duration: 0.75 }}
-                className="text-2xl md:text-3xl leading-snug text-slate-700 mt-4 font-bold tracking-tight font-outfit"
+                className={`text-2xl md:text-3xl leading-snug mt-4 font-bold tracking-tight font-outfit ${isDark ? 'text-slate-300' : 'text-slate-700'}`}
               >
                 <RomanticReveal
                   text="Let's go straight to the point then."
