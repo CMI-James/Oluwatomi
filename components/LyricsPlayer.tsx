@@ -117,8 +117,7 @@ export default function LyricsPlayer({
       audioRef.current = initialAudio;
       const alreadyPlaying =
         !initialAudio.paused &&
-        !initialAudio.muted &&
-        initialAudio.volume > 0.01;
+        !initialAudio.muted;
       hasAutoplayStartedRef.current = alreadyPlaying;
       setIsPlaying(alreadyPlaying);
     }
