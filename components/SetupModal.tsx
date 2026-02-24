@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Heart, Palette, Volume2 } from "lucide-react";
 import ColorPicker from "./ColorPicker";
 
@@ -52,6 +52,7 @@ function FloatingHearts({ color }: { color: string }) {
 export default function SetupModal({ onStart }: SetupModalProps) {
   const [selectedColor, setSelectedColor] = useState("#ec4899");
   const [audioSrc] = useState("/music/lyrics-music.mp3");
+  const [step, setStep] = useState<"color" | "volume">("color");
 
   return (
     <motion.div
@@ -149,66 +150,98 @@ export default function SetupModal({ onStart }: SetupModalProps) {
               <div className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.9)]" />
             </div>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, delay: 0.12 }}
-              className="text-[2rem] md:text-[2.25rem] leading-tight font-semibold text-slate-900"
-              style={{ fontFamily: "var(--font-playfair), serif" }}
-            >
-              Pick your color, turn the volume up, and open it.
-            </motion.h1>
-
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, delay: 0.28 }}
-              className="mt-6 rounded-2xl border border-slate-200/80 bg-white/70 p-4"
-            >
-              <div className="flex items-center gap-2 text-[0.72rem] uppercase tracking-[0.18em] text-slate-500 mb-3">
-                <Palette className="h-3.5 w-3.5" />
-                pick a color you love
-              </div>
-              <ColorPicker value={selectedColor} onChange={setSelectedColor} />
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, delay: 0.36 }}
-              className="mt-4 rounded-xl border border-slate-200/80 bg-white/65 p-4"
-            >
-              <p className="flex items-center justify-center gap-2 text-[0.68rem] uppercase tracking-[0.18em] text-slate-500">
-                <motion.span
-                  animate={{ scale: [1, 1.2, 1], opacity: [0.8, 1, 0.8] }}
-                  transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
-                  className="inline-flex"
+            <AnimatePresence mode="wait">
+              {step === "color" ? (
+                <motion.div
+                  key="setup-color-step"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.35 }}
                 >
-                  <Volume2 className="h-4 w-4" />
-                </motion.span>
-                increase your volume
-              </p>
-            </motion.div>
+                  <h1
+                    className="text-[1.9rem] md:text-[2.15rem] leading-tight font-semibold text-slate-900"
+                    style={{ fontFamily: "var(--font-playfair), serif" }}
+                  >
+                    Pick the color for tonight
+                  </h1>
+                  <p className="mt-2 text-sm text-slate-600">
+                    Choose the vibe you want this story to carry.
+                  </p>
 
-            <motion.button
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, delay: 0.46 }}
-              whileHover={{
-                scale: 1.02,
-                boxShadow: `0 18px 42px ${selectedColor}52`,
-              }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => onStart(selectedColor, audioSrc)}
-              className="mt-6 w-full rounded-2xl px-6 py-4 text-white text-base font-semibold tracking-[0.08em] transition-all"
-              style={{
-                background: `linear-gradient(135deg, ${selectedColor}, ${selectedColor}d9)`,
-                boxShadow: `0 14px 30px ${selectedColor}45`,
-                fontFamily: "var(--font-playfair), serif",
-              }}
-            >
-              Open 💕
-            </motion.button>
+                  <div className="mt-6 rounded-2xl border border-slate-200/80 bg-white/70 p-4">
+                    <div className="mb-3 flex items-center gap-2 text-[0.72rem] uppercase tracking-[0.18em] text-slate-500">
+                      <Palette className="h-3.5 w-3.5" />
+                      choose your color
+                    </div>
+                    <ColorPicker value={selectedColor} onChange={setSelectedColor} />
+                  </div>
+
+                  <button
+                    onClick={() => setStep("volume")}
+                    className="mt-6 w-full rounded-2xl px-6 py-4 text-white text-base font-semibold tracking-[0.08em] transition-all"
+                    style={{
+                      background: `linear-gradient(135deg, ${selectedColor}, ${selectedColor}d9)`,
+                      boxShadow: `0 14px 30px ${selectedColor}45`,
+                      fontFamily: "var(--font-playfair), serif",
+                    }}
+                  >
+                    Next
+                  </button>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="setup-volume-step"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.35 }}
+                >
+                  <h1
+                    className="text-[1.9rem] md:text-[2.15rem] leading-tight font-semibold text-slate-900"
+                    style={{ fontFamily: "var(--font-playfair), serif" }}
+                  >
+                    One quick thing before we start
+                  </h1>
+                  <p className="mt-2 text-sm text-slate-600">
+                    Increase your volume a little so you do not miss the moment.
+                  </p>
+
+                  <div className="mt-6 rounded-xl border border-slate-200/80 bg-white/65 p-5">
+                    <p className="flex items-center justify-center gap-2 text-[0.68rem] uppercase tracking-[0.18em] text-slate-500">
+                      <motion.span
+                        animate={{ scale: [1, 1.22, 1], opacity: [0.75, 1, 0.75] }}
+                        transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
+                        className="inline-flex"
+                      >
+                        <Volume2 className="h-5 w-5" />
+                      </motion.span>
+                      increase your volume
+                    </p>
+                  </div>
+
+                  <div className="mt-6 flex gap-3">
+                    <button
+                      onClick={() => setStep("color")}
+                      className="w-1/3 rounded-2xl px-4 py-4 text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
+                    >
+                      Back
+                    </button>
+                    <button
+                      onClick={() => onStart(selectedColor, audioSrc)}
+                      className="w-2/3 rounded-2xl px-6 py-4 text-white text-base font-semibold tracking-[0.08em] transition-all"
+                      style={{
+                        background: `linear-gradient(135deg, ${selectedColor}, ${selectedColor}d9)`,
+                        boxShadow: `0 14px 30px ${selectedColor}45`,
+                        fontFamily: "var(--font-playfair), serif",
+                      }}
+                    >
+                      Open 💕
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </motion.div>
