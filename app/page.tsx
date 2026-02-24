@@ -65,7 +65,7 @@ import PostLyricsBridgeScreen from '@/components/screens/PostLyricsBridgeScreen'
 import LyricsStopScreen from '@/components/screens/LyricsStopScreen';
 
 export default function Home() {
-  const LYRICS_PREWARM_VOLUME = 0.12;
+  const LYRICS_PREWARM_VOLUME = 0.02;
   const VALENTINE_PREWARM_VOLUME = 0.2;
 
   const [accentColor, setAccentColor] = useState('#f43f5e');

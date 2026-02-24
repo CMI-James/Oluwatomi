@@ -109,8 +109,8 @@ export default function LyricsPlayer({
     if (initialAudio) {
       initialAudio.defaultMuted = false;
       initialAudio.muted = false;
-      if (initialAudio.volume < 0.1) {
-        initialAudio.volume = 0.1;
+      if (initialAudio.volume < 0.02) {
+        initialAudio.volume = 0.02;
       }
       audioRef.current = initialAudio;
       const alreadyPlaying =
@@ -423,12 +423,13 @@ export default function LyricsPlayer({
     const audio = audioRef.current;
     if (!audio || !isPlaying) return;
 
-    // Start at a low volume
-    audio.volume = 0.1;
-    const targetVolume = 0.5;
-    const duration = 2000; // 2 seconds fade in
+    // Keep a softer entrance on lyrics track.
+    const startVolume = Math.max(0.02, Math.min(audio.volume, 0.06));
+    const targetVolume = 0.45;
+    const duration = 3600;
     const interval = 50; // Update every 50ms
-    const step = (targetVolume - 0.1) / (duration / interval);
+    audio.volume = startVolume;
+    const step = (targetVolume - startVolume) / (duration / interval);
 
     const fadeTimer = setInterval(() => {
       if (audio.volume < targetVolume) {
