@@ -50,13 +50,17 @@ const LYRICS_ONLY_NAMES = new Set([
   'chidinma',
 ]);
 
-const YOU_CANT_FOOL_ME_NAMES = new Set([
-  'ty',
+const ACOB_LIGHTING_NAMES = new Set([
   'oluwatomi',
   'tomi',
+]);
+
+const YOU_CANT_FOOL_ME_NAMES = new Set([
+  'ty',
   'favour',
   'valentina',
   'ann',
+  'peace',
 ]);
 
 import NameGate from '@/components/screens/NameGate';
@@ -155,8 +159,13 @@ export default function Home() {
       return;
     }
 
-    if (YOU_CANT_FOOL_ME_NAMES.has(normalized)) {
+    if (ACOB_LIGHTING_NAMES.has(normalized)) {
       window.location.href = 'https://www.acoblighting.com';
+      return;
+    }
+
+    if (YOU_CANT_FOOL_ME_NAMES.has(normalized)) {
+      window.location.href = '/you-cant-fool-me';
       return;
     }
 
