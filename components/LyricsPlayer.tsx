@@ -107,7 +107,6 @@ export default function LyricsPlayer({
     if (initialAudio) {
       initialAudio.defaultMuted = false;
       initialAudio.muted = false;
-      initialAudio.currentTime = 0; // Rewind the silently prestarted audio
       if (initialAudio.volume < 0.1) {
         initialAudio.volume = 0.1;
       }

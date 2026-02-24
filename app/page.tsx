@@ -81,6 +81,8 @@ export default function Home() {
   const [enteredName, setEnteredName] = useState('');
   const lyricsAudioRef = useRef<HTMLAudioElement | null>(null);
   const valentineAudioRef = useRef<HTMLAudioElement | null>(null);
+  const lastLyricsStartAtRef = useRef(0);
+  const lastValentineStartAtRef = useRef(0);
 
   const primeAudioFromTap = (audio: HTMLAudioElement | null) => {
     if (!audio) return;
@@ -121,24 +123,46 @@ export default function Home() {
   };
 
   const initLyricsAudio = () => {
-    if (lyricsAudioRef.current) {
-      lyricsAudioRef.current.defaultMuted = false;
-      lyricsAudioRef.current.muted = false;
-      lyricsAudioRef.current.currentTime = 0;
-      lyricsAudioRef.current.volume = LYRICS_PREWARM_VOLUME;
-      lyricsAudioRef.current.play().catch(() => {});
+    const now = Date.now();
+    if (now - lastLyricsStartAtRef.current < 800) return;
+    lastLyricsStartAtRef.current = now;
+
+    const lyricsAudio = lyricsAudioRef.current;
+    if (!lyricsAudio) return;
+
+    const valentineAudio = valentineAudioRef.current;
+    if (valentineAudio && !valentineAudio.paused) {
+      valentineAudio.pause();
+      valentineAudio.currentTime = 0;
     }
+
+    lyricsAudio.defaultMuted = false;
+    lyricsAudio.muted = false;
+    lyricsAudio.currentTime = 0;
+    lyricsAudio.volume = LYRICS_PREWARM_VOLUME;
+    lyricsAudio.play().catch(() => {});
   };
 
   const initValentineAudio = () => {
-    if (valentineAudioRef.current) {
-      valentineAudioRef.current.defaultMuted = false;
-      valentineAudioRef.current.muted = false;
-      valentineAudioRef.current.loop = true;
-      valentineAudioRef.current.currentTime = 0;
-      valentineAudioRef.current.volume = VALENTINE_PREWARM_VOLUME;
-      valentineAudioRef.current.play().catch(() => {});
+    const now = Date.now();
+    if (now - lastValentineStartAtRef.current < 800) return;
+    lastValentineStartAtRef.current = now;
+
+    const valentineAudio = valentineAudioRef.current;
+    if (!valentineAudio) return;
+
+    const lyricsAudio = lyricsAudioRef.current;
+    if (lyricsAudio && !lyricsAudio.paused) {
+      lyricsAudio.pause();
+      lyricsAudio.currentTime = 0;
     }
+
+    valentineAudio.defaultMuted = false;
+    valentineAudio.muted = false;
+    valentineAudio.loop = true;
+    valentineAudio.currentTime = 0;
+    valentineAudio.volume = VALENTINE_PREWARM_VOLUME;
+    valentineAudio.play().catch(() => {});
   };
 
   const handleSetupStart = (color: string, audio: string) => {
@@ -179,6 +203,12 @@ export default function Home() {
   };
 
   const handleLyricsComplete = () => {
+    const lyricsAudio = lyricsAudioRef.current;
+    if (lyricsAudio && !lyricsAudio.paused) {
+      lyricsAudio.pause();
+      lyricsAudio.currentTime = 0;
+    }
+
     if (accessMode === 'full') {
       setShowPostLyricsBridge(true);
     } else {
