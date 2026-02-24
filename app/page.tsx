@@ -60,7 +60,6 @@ const YOU_CANT_FOOL_ME_NAMES = new Set([
 ]);
 
 import NameGate from '@/components/screens/NameGate';
-import AudioEnableScreen from '@/components/screens/AudioEnableScreen';
 import LyricsIntroScreen from '@/components/screens/LyricsIntroScreen';
 import PostLyricsBridgeScreen from '@/components/screens/PostLyricsBridgeScreen';
 import LyricsStopScreen from '@/components/screens/LyricsStopScreen';
@@ -78,50 +77,11 @@ export default function Home() {
   const [stopAfterLyrics, setStopAfterLyrics] = useState(false);
   const [accessMode, setAccessMode] = useState<AccessMode>(null);
   const [nameAccepted, setNameAccepted] = useState(false);
-  const [showAudioEnableScreen, setShowAudioEnableScreen] = useState(false);
   const [enteredName, setEnteredName] = useState('');
   const lyricsAudioRef = useRef<HTMLAudioElement | null>(null);
   const valentineAudioRef = useRef<HTMLAudioElement | null>(null);
   const lastLyricsStartAtRef = useRef(0);
   const lastValentineStartAtRef = useRef(0);
-
-  const primeAudioFromTap = async (audio: HTMLAudioElement | null) => {
-    if (!audio) return;
-
-    const previousMuted = audio.muted;
-    const previousDefaultMuted = audio.defaultMuted;
-    const previousVolume = audio.volume;
-    const previousLoop = audio.loop;
-    const previousTime = audio.currentTime;
-
-    audio.defaultMuted = true;
-    audio.muted = true;
-    audio.volume = 0;
-    audio.loop = false;
-
-    const restore = () => {
-      audio.defaultMuted = previousDefaultMuted;
-      audio.muted = previousMuted;
-      audio.volume = previousVolume;
-      audio.loop = previousLoop;
-      audio.currentTime = previousTime || 0;
-    };
-
-    const playPromise = audio.play();
-    if (!playPromise) {
-      restore();
-      return;
-    }
-
-    await playPromise
-      .then(() => {
-        audio.pause();
-      })
-      .catch(() => {
-        // Ignore; this is only a best-effort prime.
-      })
-      .finally(restore);
-  };
 
   const initLyricsAudio = () => {
     const now = Date.now();
@@ -169,18 +129,8 @@ export default function Home() {
   const handleSetupStart = (color: string, audio: string) => {
     setAccentColor(color);
     setAudioSrc(audio);
-    setShowAudioEnableScreen(true);
-  };
-
-  const handleEnableAudio = () => {
-    void Promise.allSettled([
-      primeAudioFromTap(lyricsAudioRef.current),
-      primeAudioFromTap(valentineAudioRef.current),
-    ]).finally(() => {
-      setShowAudioEnableScreen(false);
-      setHasStarted(true);
-      setShowLyricsIntro(true);
-    });
+    setHasStarted(true);
+    setShowLyricsIntro(true);
   };
 
   const handleNameSubmit = (name: string) => {
@@ -230,12 +180,6 @@ export default function Home() {
       <AnimatePresence mode="wait">
       {!nameAccepted ? (
         <NameGate onSubmit={handleNameSubmit} />
-      ) : showAudioEnableScreen ? (
-        <AudioEnableScreen
-          key="audio-enable"
-          accentColor={accentColor}
-          onEnable={handleEnableAudio}
-        />
       ) : !hasStarted ? (
         <SetupModal key="setup" onStart={handleSetupStart} />
       ) : showLyricsIntro ? (
@@ -246,11 +190,6 @@ export default function Home() {
           onContinue={() => {
             initLyricsAudio();
             setShowLyricsIntro(false);
-          }}
-          onBack={() => {
-            setShowLyricsIntro(false);
-            setHasStarted(false);
-            setShowAudioEnableScreen(false);
           }}
         />
       ) : showPostLyricsBridge ? (
@@ -263,7 +202,6 @@ export default function Home() {
             setShowPostLyricsBridge(false);
             setShowValentine(true);
           }}
-          onBack={() => setShowPostLyricsBridge(false)}
         />
       ) : !showValentine && !stopAfterLyrics ? (
         <motion.div

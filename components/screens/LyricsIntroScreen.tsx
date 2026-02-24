@@ -3,20 +3,17 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import RomanticReveal from '../ui/RomanticReveal';
-import ScrollIndicator from '../ui/ScrollIndicator';
 
 interface LyricsIntroScreenProps {
   name: string;
   accentColor: string;
   onContinue: () => void;
-  onBack: () => void;
 }
 
 export default function LyricsIntroScreen({
   name,
   accentColor,
   onContinue,
-  onBack,
 }: LyricsIntroScreenProps) {
   const [isComplete, setIsComplete] = useState(false);
 
@@ -61,14 +58,23 @@ export default function LyricsIntroScreen({
         >
           Hope you've increased your volume a little.
         </motion.p>
+        <motion.button
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 4.2, duration: 0.6 }}
+          onClick={onContinue}
+          disabled={!isComplete}
+          className={`mt-6 w-full rounded-2xl px-6 py-3.5 text-white text-sm md:text-base font-semibold tracking-[0.05em] ${
+            isComplete ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'
+          }`}
+          style={{
+            background: `linear-gradient(135deg, ${accentColor}, ${accentColor}d9)`,
+            boxShadow: `0 12px 26px ${accentColor}40`,
+          }}
+        >
+          Continue
+        </motion.button>
       </div>
-      <ScrollIndicator 
-        onNext={() => isComplete && onContinue()} 
-        onPrevious={onBack} 
-        accentColor={accentColor} 
-        delay={2.5}
-        isLocked={!isComplete}
-      />
     </motion.div>
   );
 }

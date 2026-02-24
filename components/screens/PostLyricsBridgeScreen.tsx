@@ -3,20 +3,17 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import RomanticReveal from '../ui/RomanticReveal';
-import ScrollIndicator from '../ui/ScrollIndicator';
 
 interface PostLyricsBridgeScreenProps {
   name: string;
   accentColor: string;
   onContinue: () => void;
-  onBack: () => void;
 }
 
 export default function PostLyricsBridgeScreen({
   name,
   accentColor,
   onContinue,
-  onBack,
 }: PostLyricsBridgeScreenProps) {
   const [showQuestionLine, setShowQuestionLine] = useState(false);
   const [showPointLine, setShowPointLine] = useState(false);
@@ -90,14 +87,23 @@ export default function PostLyricsBridgeScreen({
             )}
           </AnimatePresence>
         </div>
+        <motion.button
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 3.7, duration: 0.6 }}
+          onClick={onContinue}
+          disabled={!showPointLine}
+          className={`mt-4 w-full rounded-2xl px-6 py-3.5 text-white text-sm md:text-base font-semibold tracking-[0.05em] ${
+            showPointLine ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'
+          }`}
+          style={{
+            background: `linear-gradient(135deg, ${accentColor}, ${accentColor}d9)`,
+            boxShadow: `0 12px 26px ${accentColor}40`,
+          }}
+        >
+          Continue
+        </motion.button>
       </div>
-      <ScrollIndicator 
-        onNext={() => showPointLine && onContinue()} 
-        onPrevious={onBack} 
-        accentColor={accentColor} 
-        delay={4.8}
-        isLocked={!showPointLine}
-      />
     </motion.div>
   );
 }
