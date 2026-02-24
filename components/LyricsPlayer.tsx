@@ -426,7 +426,7 @@ export default function LyricsPlayer({
     // Keep a softer entrance on lyrics track.
     const startVolume = Math.max(0.01, Math.min(audio.volume, 0.03));
     const targetVolume = 0.45;
-    const duration = 1000;
+    const duration = 3000;
     const interval = 50; // Update every 50ms
     audio.volume = startVolume;
     const step = (targetVolume - startVolume) / (duration / interval);
