@@ -77,6 +77,29 @@ export default function Home() {
   const [nameAccepted, setNameAccepted] = useState(false);
   const [enteredName, setEnteredName] = useState('');
 
+  const primeAudioOnGesture = (src: string) => {
+    try {
+      const audio = new Audio(src);
+      audio.defaultMuted = false;
+      audio.muted = false;
+      audio.volume = 0.01;
+      const playPromise = audio.play();
+      if (playPromise && typeof playPromise.then === 'function') {
+        playPromise
+          .then(() => {
+            audio.pause();
+            audio.currentTime = 0;
+            audio.src = '';
+          })
+          .catch(() => {
+            audio.src = '';
+          });
+      }
+    } catch {
+      // Ignore priming errors; normal playback fallbacks still run in player components.
+    }
+  };
+
   const handleSetupStart = (color: string, audio: string) => {
     setAccentColor(color);
     setAudioSrc(audio);
@@ -129,7 +152,10 @@ export default function Home() {
           key="lyrics-intro"
           name={enteredName || 'love'}
           accentColor={accentColor}
-          onContinue={() => setShowLyricsIntro(false)}
+          onContinue={() => {
+            primeAudioOnGesture(audioSrc);
+            setShowLyricsIntro(false);
+          }}
           onBack={() => {
             setShowLyricsIntro(false);
             setHasStarted(false);
@@ -141,6 +167,7 @@ export default function Home() {
           name={enteredName || 'love'}
           accentColor={accentColor}
           onContinue={() => {
+            primeAudioOnGesture('/music/blue.mp3');
             setShowPostLyricsBridge(false);
             setShowValentine(true);
           }}
