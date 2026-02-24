@@ -832,7 +832,7 @@ export default function ValentinePages({
                       backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.75)',
                     }}
                   >
-                    Setup
+                    Reset
                   </motion.button>
                 </div>
               </motion.div>
