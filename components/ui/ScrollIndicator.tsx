@@ -59,7 +59,7 @@ export default function ScrollIndicator({
 
     const handleWheel = (event: WheelEvent) => {
       if (Math.abs(event.deltaY) < 22) return;
-      if (event.deltaY < 0) triggerNext();
+      if (event.deltaY > 0) triggerNext();
       else triggerPrevious();
     };
 

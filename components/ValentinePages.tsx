@@ -410,8 +410,8 @@ export default function ValentinePages({ accentColor, name = 'love', initialAudi
 
       if (Math.abs(wheelAccumRef.current) < 65) return;
 
-      if (wheelAccumRef.current > 0) handleNavigation(-1);
-      else handleNavigation(1);
+      if (wheelAccumRef.current > 0) handleNavigation(1);
+      else handleNavigation(-1);
 
       wheelAccumRef.current = 0;
     };
