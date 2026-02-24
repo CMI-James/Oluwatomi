@@ -637,10 +637,6 @@ export default function ValentinePages({
                 <RomanticReveal
                   text="Even if it's just a feeling..."
                   baseDelay={5.2}
-                />
-                <RomanticReveal
-                  text="But....."
-                  baseDelay={7.2}
                   onComplete={() => setIsPreludeMessageComplete(true)}
                 />
               </motion.div>
