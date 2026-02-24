@@ -31,7 +31,7 @@ export default function LyricsIntroScreen({
       }}
     >
       <div
-        className="max-w-2xl w-full rounded-4xl border bg-white/88 backdrop-blur-xl p-8 md:p-11 text-center shadow-[0_24px_80px_rgba(15,23,42,0.10)]"
+        className="max-w-2xl w-full h-[30rem] md:h-[33rem] rounded-4xl border bg-white/88 backdrop-blur-xl p-8 md:p-11 text-center shadow-[0_24px_80px_rgba(15,23,42,0.10)] flex flex-col justify-center"
         style={{ borderColor: `${accentColor}33` }}
       >
         <motion.h2
