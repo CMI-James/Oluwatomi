@@ -102,8 +102,11 @@ export default function Home() {
         vAudio.loop = true;
         vAudio.defaultMuted = false;
         vAudio.muted = false;
-        vAudio.volume = 0.25;
-        vAudio.play().catch(() => {});
+        vAudio.volume = 0;
+        vAudio.play().then(() => {
+          vAudio.pause();
+          vAudio.currentTime = 0;
+        }).catch(() => {});
         valentineAudioRef.current = vAudio;
       } catch (e) {}
     }

@@ -13,33 +13,38 @@ interface SetupModalProps {
 function FloatingHearts({ color }: { color: string }) {
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden">
-      {[...Array(10)].map((_, i) => (
-        <motion.div
-          key={i}
-          initial={{
-            opacity: 0,
-            y: "106%",
-            x: `${8 + Math.random() * 84}%`,
-            scale: 0.3 + Math.random() * 0.5,
-            rotate: -20 + Math.random() * 40,
-          }}
-          animate={{
-            opacity: [0, 0.26, 0.2, 0],
-            y: "-8%",
-            rotate: -20 + Math.random() * 40,
-          }}
-          transition={{
-            duration: 10 + Math.random() * 5,
-            repeat: Infinity,
-            delay: Math.random() * 8,
-            ease: "easeOut",
-          }}
-          className="absolute text-base md:text-lg blur-[0.3px]"
-          style={{ color }}
-        >
-          {["♥", "♡", "❤", "✦"][i % 4]}
-        </motion.div>
-      ))}
+      {[...Array(10)].map((_, i) => {
+        const r1 = (i * 13) % 100 / 100;
+        const r2 = (i * 27) % 100 / 100;
+        const r3 = (i * 7) % 100 / 100;
+        return (
+          <motion.div
+            key={i}
+            initial={{
+              opacity: 0,
+              y: "106%",
+              x: `${8 + r1 * 84}%`,
+              scale: 0.3 + r2 * 0.5,
+              rotate: -20 + r3 * 40,
+            }}
+            animate={{
+              opacity: [0, 0.26, 0.2, 0],
+              y: "-8%",
+              rotate: -20 + r3 * 40,
+            }}
+            transition={{
+              duration: 10 + r1 * 5,
+              repeat: Infinity,
+              delay: r2 * 8,
+              ease: "easeOut",
+            }}
+            className="absolute text-base md:text-lg blur-[0.3px]"
+            style={{ color }}
+          >
+            {["♥", "♡", "❤", "✦"][i % 4]}
+          </motion.div>
+        );
+      })}
     </div>
   );
 }

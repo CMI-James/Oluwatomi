@@ -768,7 +768,7 @@ export default function ValentinePages({ accentColor, name = 'love', initialAudi
                   ...Or just wait for part 2.
                 </p>
                 <p className="text-xs md:text-sm text-slate-500/80">
-                  well you voted for it for Thu, 16th Apri at 21:00
+                  well you voted for it for Thu, 16th Apr at 21:00
                 </p>
                 <div className="h-px bg-linear-to-r from-transparent via-slate-300 to-transparent w-full mt-12" />
                 <Countdown accentColor={accentColor} />
