@@ -79,7 +79,7 @@ export default function Home() {
   const lyricsAudioRef = useRef<HTMLAudioElement | null>(null);
   const valentineAudioRef = useRef<HTMLAudioElement | null>(null);
 
-  const initGlobalAudio = (src: string) => {
+  const initLyricsAudio = (src: string) => {
     if (!lyricsAudioRef.current) {
       try {
         const lAudio = new Audio(src);
@@ -93,18 +93,17 @@ export default function Home() {
         lyricsAudioRef.current = lAudio;
       } catch (e) {}
     }
+  };
 
+  const initValentineAudio = () => {
     if (!valentineAudioRef.current) {
       try {
         const vAudio = new Audio('/music/blue.mp3');
         vAudio.loop = true;
         vAudio.defaultMuted = false;
         vAudio.muted = false;
-        vAudio.volume = 0;
-        vAudio.play().then(() => {
-          vAudio.pause();
-          vAudio.currentTime = 0;
-        }).catch(() => {});
+        vAudio.volume = 0.25;
+        vAudio.play().catch(() => {});
         valentineAudioRef.current = vAudio;
       } catch (e) {}
     }
@@ -163,7 +162,7 @@ export default function Home() {
           name={enteredName || 'love'}
           accentColor={accentColor}
           onContinue={() => {
-            initGlobalAudio(audioSrc);
+            initLyricsAudio(audioSrc);
             setShowLyricsIntro(false);
           }}
           onBack={() => {
@@ -177,6 +176,7 @@ export default function Home() {
           name={enteredName || 'love'}
           accentColor={accentColor}
           onContinue={() => {
+            initValentineAudio();
             setShowPostLyricsBridge(false);
             setShowValentine(true);
           }}
