@@ -79,30 +79,19 @@ export default function Home() {
   const lyricsAudioRef = useRef<HTMLAudioElement | null>(null);
   const valentineAudioRef = useRef<HTMLAudioElement | null>(null);
 
-  const initLyricsAudio = (src: string) => {
-    if (!lyricsAudioRef.current) {
-      try {
-        const lAudio = new Audio(src);
-        lAudio.defaultMuted = false;
-        lAudio.muted = false;
-        lAudio.volume = 0;
-        lAudio.play().catch(() => {});
-        lyricsAudioRef.current = lAudio;
-      } catch (e) {}
+  const initLyricsAudio = () => {
+    if (lyricsAudioRef.current) {
+      lyricsAudioRef.current.volume = 0;
+      lyricsAudioRef.current.muted = false;
+      lyricsAudioRef.current.play().catch(() => {});
     }
   };
 
   const initValentineAudio = () => {
-    if (!valentineAudioRef.current) {
-      try {
-        const vAudio = new Audio('/music/blue.mp3');
-        vAudio.loop = true;
-        vAudio.defaultMuted = false;
-        vAudio.muted = false;
-        vAudio.volume = 0;
-        vAudio.play().catch(() => {});
-        valentineAudioRef.current = vAudio;
-      } catch (e) {}
+    if (valentineAudioRef.current) {
+      valentineAudioRef.current.volume = 0;
+      valentineAudioRef.current.muted = false;
+      valentineAudioRef.current.play().catch(() => {});
     }
   };
 
@@ -148,7 +137,10 @@ export default function Home() {
   };
 
   return (
-    <AnimatePresence mode="wait">
+    <>
+      <audio ref={lyricsAudioRef} src={audioSrc} preload="auto" className="hidden" />
+      <audio ref={valentineAudioRef} src="/music/blue.mp3" preload="auto" loop className="hidden" />
+      <AnimatePresence mode="wait">
       {!nameAccepted ? (
         <NameGate onSubmit={handleNameSubmit} />
       ) : !hasStarted ? (
@@ -159,7 +151,7 @@ export default function Home() {
           name={enteredName || 'love'}
           accentColor={accentColor}
           onContinue={() => {
-            initLyricsAudio(audioSrc);
+            initLyricsAudio();
             setShowLyricsIntro(false);
           }}
           onBack={() => {
@@ -215,5 +207,6 @@ export default function Home() {
         </motion.div>
       )}
     </AnimatePresence>
+    </>
   );
 }
