@@ -13,6 +13,7 @@ import Countdown from './ui/Countdown';
 interface ValentinePagesProps {
   accentColor: string;
   name?: string;
+  initialAudio?: HTMLAudioElement | null;
 }
 
 type Page = 'question' | 'yes-response' | 'yes-response-message' | 'post-yes-message' | 'oluwatomi-page1' | 'pre-oluwatomi-message' | 'oluwatomi-page2' | 'oluwatomi-page3' | 'smile-prompt' | 'part2-teaser';
@@ -201,7 +202,7 @@ const ConfettiBurst = ({ accentColor }: { accentColor: string }) => {
 
 
 
-export default function ValentinePages({ accentColor, name = 'love' }: ValentinePagesProps) {
+export default function ValentinePages({ accentColor, name = 'love', initialAudio = null }: ValentinePagesProps) {
   const TARGET_MUSIC_VOLUME = 0.4;
   const START_MUSIC_VOLUME = 0.2;
   const FADE_IN_DURATION_MS = 2200;
@@ -223,6 +224,7 @@ export default function ValentinePages({ accentColor, name = 'love' }: Valentine
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const fadeTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const preludeAutoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const audioStartInFlightRef = useRef(false);
   const lastNavTimeRef = useRef(0);
   const touchStartYRef = useRef<number | null>(null);
   const wheelAccumRef = useRef(0);
@@ -250,10 +252,12 @@ export default function ValentinePages({ accentColor, name = 'love' }: Valentine
   const playAudioWithFade = useCallback(async () => {
     const audio = audioRef.current;
     if (!audio) return;
+    if (audioStartInFlightRef.current || isAudioPlaying) return;
 
     clearFadeTimer();
     audio.muted = false;
     audio.volume = START_MUSIC_VOLUME;
+    audioStartInFlightRef.current = true;
 
     try {
       await audio.play();
@@ -278,10 +282,23 @@ export default function ValentinePages({ accentColor, name = 'love' }: Valentine
       }, FADE_STEP_MS);
     } catch (error) {
       console.error(error);
+    } finally {
+      audioStartInFlightRef.current = false;
     }
-  }, [clearFadeTimer, FADE_IN_DURATION_MS, FADE_STEP_MS, START_MUSIC_VOLUME, TARGET_MUSIC_VOLUME]);
+  }, [clearFadeTimer, FADE_IN_DURATION_MS, FADE_STEP_MS, START_MUSIC_VOLUME, TARGET_MUSIC_VOLUME, isAudioPlaying]);
 
   useEffect(() => {
+    if (initialAudio) {
+      initialAudio.loop = true;
+      initialAudio.defaultMuted = false;
+      initialAudio.muted = false;
+      audioRef.current = initialAudio;
+      setIsAudioPlaying(!initialAudio.paused);
+      return () => {
+        clearFadeTimer();
+      };
+    }
+
     const audio = new Audio('/music/blue.mp3');
     audio.loop = true;
     audio.defaultMuted = false;
@@ -293,7 +310,7 @@ export default function ValentinePages({ accentColor, name = 'love' }: Valentine
       audio.pause();
       audio.src = '';
     };
-  }, [TARGET_MUSIC_VOLUME, clearFadeTimer]);
+  }, [TARGET_MUSIC_VOLUME, clearFadeTimer, initialAudio]);
 
   useEffect(() => {
     if (!audioRef.current) return;
@@ -310,11 +327,15 @@ export default function ValentinePages({ accentColor, name = 'love' }: Valentine
     };
 
     window.addEventListener('touchstart', retryPlay, { passive: true });
+    window.addEventListener('touchend', retryPlay, { passive: true });
+    window.addEventListener('wheel', retryPlay, { passive: true });
     window.addEventListener('pointerdown', retryPlay, { passive: true });
     window.addEventListener('keydown', retryPlay);
 
     return () => {
       window.removeEventListener('touchstart', retryPlay);
+      window.removeEventListener('touchend', retryPlay);
+      window.removeEventListener('wheel', retryPlay);
       window.removeEventListener('pointerdown', retryPlay);
       window.removeEventListener('keydown', retryPlay);
     };

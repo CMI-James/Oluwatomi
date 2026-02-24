@@ -359,6 +359,8 @@ export default function LyricsPlayer({
       void startPlayback();
     };
     window.addEventListener('touchstart', handleUserInteraction, { passive: true });
+    window.addEventListener('touchend', handleUserInteraction, { passive: true });
+    window.addEventListener('wheel', handleUserInteraction, { passive: true });
     window.addEventListener('pointerdown', handleUserInteraction, { passive: true });
     window.addEventListener('keydown', handleUserInteraction);
 
@@ -366,6 +368,8 @@ export default function LyricsPlayer({
       cancelled = true;
       clearTimeout(timer);
       window.removeEventListener('touchstart', handleUserInteraction);
+      window.removeEventListener('touchend', handleUserInteraction);
+      window.removeEventListener('wheel', handleUserInteraction);
       window.removeEventListener('pointerdown', handleUserInteraction);
       window.removeEventListener('keydown', handleUserInteraction);
     };

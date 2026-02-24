@@ -76,6 +76,7 @@ export default function Home() {
   const [accessMode, setAccessMode] = useState<AccessMode>(null);
   const [nameAccepted, setNameAccepted] = useState(false);
   const [enteredName, setEnteredName] = useState('');
+  const valentineAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const primeAudioOnGesture = (src: string) => {
     try {
@@ -97,6 +98,27 @@ export default function Home() {
       }
     } catch {
       // Ignore priming errors; normal playback fallbacks still run in player components.
+    }
+  };
+
+  const startValentineAudioOnGesture = () => {
+    try {
+      if (!valentineAudioRef.current) {
+        const audio = new Audio('/music/blue.mp3');
+        audio.loop = true;
+        audio.defaultMuted = false;
+        audio.muted = false;
+        audio.volume = 0.25;
+        valentineAudioRef.current = audio;
+      }
+      const audio = valentineAudioRef.current;
+      audio.defaultMuted = false;
+      audio.muted = false;
+      void audio.play().catch(() => {
+        // ValentinePages still has fallback gesture retries if this fails.
+      });
+    } catch {
+      // Ignore and let ValentinePages handle fallback.
     }
   };
 
@@ -167,7 +189,7 @@ export default function Home() {
           name={enteredName || 'love'}
           accentColor={accentColor}
           onContinue={() => {
-            primeAudioOnGesture('/music/blue.mp3');
+            startValentineAudioOnGesture();
             setShowPostLyricsBridge(false);
             setShowValentine(true);
           }}
@@ -185,7 +207,7 @@ export default function Home() {
             lyrics={SAMPLE_LYRICS}
             accentColor={accentColor}
             audioSrc={audioSrc}
-            startDelay={0.8}
+            startDelay={0.2}
             onLyricsComplete={handleLyricsComplete}
           />
         </motion.div>
@@ -200,7 +222,11 @@ export default function Home() {
           transition={{ duration: 1.5, ease: [0.23, 1, 0.32, 1] }}
           className="fixed inset-0 w-full h-full"
         >
-          <ValentinePages accentColor={accentColor} name={enteredName || 'love'} />
+          <ValentinePages
+            accentColor={accentColor}
+            name={enteredName || 'love'}
+            initialAudio={valentineAudioRef.current}
+          />
         </motion.div>
       )}
     </AnimatePresence>
