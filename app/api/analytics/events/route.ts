@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getSupabaseServerConfig } from '@/lib/server-supabase';
 
 export const runtime = 'nodejs';
 
@@ -49,11 +50,17 @@ const getIp = (req: NextRequest): string | null => {
 };
 
 export async function POST(req: NextRequest) {
-  const supabaseUrl = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const { supabaseUrl, serviceRoleKey, hasSupabaseUrl, hasServiceRoleKey } =
+    getSupabaseServerConfig();
 
   if (!supabaseUrl || !serviceRoleKey) {
-    return NextResponse.json({ error: 'Server analytics env not configured.' }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: 'Server analytics env not configured.',
+        debug: { hasSupabaseUrl, hasServiceRoleKey, nodeEnv: process.env.NODE_ENV || 'unknown' },
+      },
+      { status: 500 }
+    );
   }
 
   let body: { sessionId?: string; events?: IncomingEvent[] } | null = null;
@@ -125,4 +132,3 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ ok: true, inserted: rows.length });
 }
-

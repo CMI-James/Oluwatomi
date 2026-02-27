@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { DETAILS_AUTH_COOKIE, isValidDetailsCookie } from '@/lib/details-auth';
+import { getSupabaseServerConfig } from '@/lib/server-supabase';
 
 export const runtime = 'nodejs';
 
@@ -29,10 +30,16 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const supabaseUrl = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const { supabaseUrl, serviceRoleKey, hasSupabaseUrl, hasServiceRoleKey } =
+    getSupabaseServerConfig();
   if (!supabaseUrl || !serviceRoleKey) {
-    return NextResponse.json({ error: 'Server analytics env not configured.' }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: 'Server analytics env not configured.',
+        debug: { hasSupabaseUrl, hasServiceRoleKey, nodeEnv: process.env.NODE_ENV || 'unknown' },
+      },
+      { status: 500 }
+    );
   }
 
   const select =
@@ -99,4 +106,3 @@ export async function GET(req: NextRequest) {
     rows,
   });
 }
-
