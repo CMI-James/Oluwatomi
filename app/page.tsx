@@ -1,10 +1,18 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LyricsPlayer from '@/components/LyricsPlayer';
 import ValentinePages from '@/components/ValentinePages';
 import SetupModal from '@/components/SetupModal';
+import {
+  flushAnalytics,
+  initAnalytics,
+  resetAnalyticsFlowPage,
+  setAnalyticsVisitorName,
+  trackInteraction,
+  trackScreenChange,
+} from '@/lib/analytics-client';
 
 const SAMPLE_LYRICS = [
   { id: 1, text: "Maybe it's 6:45", timestamp: 0.1, endTime: 2.0 },
@@ -83,6 +91,7 @@ export default function Home() {
   const [accessMode, setAccessMode] = useState<AccessMode>(null);
   const [nameAccepted, setNameAccepted] = useState(false);
   const [enteredName, setEnteredName] = useState('');
+  const [valentinePageKey, setValentinePageKey] = useState('question');
   const lyricsAudioRef = useRef<HTMLAudioElement | null>(null);
   const valentineAudioRef = useRef<HTMLAudioElement | null>(null);
   const lastLyricsStartAtRef = useRef(0);
@@ -132,6 +141,13 @@ export default function Home() {
   };
 
   useEffect(() => {
+    initAnalytics();
+    return () => {
+      void flushAnalytics();
+    };
+  }, []);
+
+  useEffect(() => {
     const root = document.documentElement;
     if (themeMode === 'dark') {
       root.classList.add('dark');
@@ -141,6 +157,7 @@ export default function Home() {
   }, [themeMode]);
 
   const handleSetupStart = (color: string, audio: string, mode: 'light' | 'dark') => {
+    trackInteraction('setup_modal', { action: 'start', mode, color });
     setAccentColor(color);
     setAudioSrc(audio);
     setThemeMode(mode);
@@ -208,7 +225,37 @@ export default function Home() {
     setShowLyricsIntro(false);
     setStopAfterLyrics(false);
     setHasStarted(false);
+    setValentinePageKey('question');
+    resetAnalyticsFlowPage();
   };
+
+  useEffect(() => {
+    if (nameAccepted && enteredName) {
+      setAnalyticsVisitorName(enteredName);
+    }
+  }, [enteredName, nameAccepted]);
+
+  const activeScreenKey = useMemo(() => {
+    if (!nameAccepted) return 'name_gate';
+    if (!hasStarted) return 'setup_modal';
+    if (showLyricsIntro) return 'lyrics_intro';
+    if (showPostLyricsBridge) return 'post_lyrics_bridge';
+    if (!showValentine && !stopAfterLyrics) return 'lyrics_player';
+    if (stopAfterLyrics) return 'lyrics_stop';
+    return `valentine:${valentinePageKey}`;
+  }, [
+    hasStarted,
+    nameAccepted,
+    showLyricsIntro,
+    showPostLyricsBridge,
+    showValentine,
+    stopAfterLyrics,
+    valentinePageKey,
+  ]);
+
+  useEffect(() => {
+    trackScreenChange(activeScreenKey, enteredName || undefined);
+  }, [activeScreenKey, enteredName]);
 
   return (
     <>
@@ -231,6 +278,7 @@ export default function Home() {
           accentColor={accentColor}
           isDark={themeMode === 'dark'}
           onContinue={() => {
+            trackInteraction('lyrics_intro', { action: 'continue' });
             initLyricsAudio();
             setShowLyricsIntro(false);
           }}
@@ -242,6 +290,7 @@ export default function Home() {
           accentColor={accentColor}
           isDark={themeMode === 'dark'}
           onContinue={() => {
+            trackInteraction('post_lyrics_bridge', { action: 'continue' });
             initValentineAudio();
             setShowPostLyricsBridge(false);
             setShowValentine(true);
@@ -284,6 +333,7 @@ export default function Home() {
             isDark={themeMode === 'dark'}
             autoStartAudio={false}
             onReturnToSetup={handleReturnToSetup}
+            onPageChange={setValentinePageKey}
           />
         </motion.div>
       )}

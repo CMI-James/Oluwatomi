@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Playfair_Display, Great_Vibes, Dancing_Script, Cormorant_Garamond, Fraunces, Outfit } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -64,6 +65,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} ${greatVibes.variable} ${dancingScript.variable} ${cormorant.variable} ${fraunces.variable} ${outfit.variable} antialiased`}
       >
         {children}
+        <Analytics />
       </body>
     </html>
   );

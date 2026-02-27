@@ -17,6 +17,7 @@ interface ValentinePagesProps {
   isDark?: boolean;
   autoStartAudio?: boolean;
   onReturnToSetup?: () => void;
+  onPageChange?: (page: Page) => void;
 }
 
 type Page = 'question' | 'yes-response' | 'yes-response-message' | 'post-yes-message' | 'oluwatomi-page1' | 'pre-oluwatomi-message' | 'oluwatomi-page2' | 'oluwatomi-page3' | 'smile-prompt' | 'part2-teaser';
@@ -212,6 +213,7 @@ export default function ValentinePages({
   isDark = false,
   autoStartAudio = true,
   onReturnToSetup,
+  onPageChange,
 }: ValentinePagesProps) {
   const TARGET_MUSIC_VOLUME = 0.4;
   const START_MUSIC_VOLUME = 0.2;
@@ -251,6 +253,10 @@ export default function ValentinePages({
     return Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
   }, []);
   const valentinesDayLabel = daysAfterValentines === 1 ? 'day' : 'days';
+
+  useEffect(() => {
+    onPageChange?.(currentPage);
+  }, [currentPage, onPageChange]);
 
   const clearFadeTimer = useCallback(() => {
     if (fadeTimerRef.current) {
