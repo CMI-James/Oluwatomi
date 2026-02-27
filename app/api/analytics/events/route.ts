@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseServerConfig } from '@/lib/server-supabase';
+import { sendVisitorLoadEmail } from '@/lib/email-alert';
 
 export const runtime = 'nodejs';
 
@@ -128,6 +129,25 @@ export async function POST(req: NextRequest) {
 
   if (!rows.length) {
     return NextResponse.json({ error: 'No valid events.' }, { status: 400 });
+  }
+
+  const loadEvent = rows.find(
+    (row) => row.event_type === 'session_start' && (row.meta as { is_bot?: boolean })?.is_bot !== true
+  );
+
+  if (loadEvent) {
+    void sendVisitorLoadEmail({
+      occurredAt: loadEvent.occurred_at,
+      ip: loadEvent.ip,
+      deviceType: loadEvent.device_type,
+      os: loadEvent.os,
+      browser: loadEvent.browser,
+      path: loadEvent.path,
+      url: loadEvent.url,
+      visitorName: loadEvent.visitor_name,
+    }).catch(() => {
+      // Never fail analytics ingest because email delivery fails.
+    });
   }
 
   const response = await fetch(`${supabaseUrl}/rest/v1/analytics_events`, {
