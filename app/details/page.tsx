@@ -7,6 +7,7 @@ type DetailsResponse = {
     totalEvents: number;
     uniqueSessions: number;
     deviceCount: { mobile: number; tablet: number; desktop: number; unknown: number };
+    includeBots: boolean;
   };
   pages: Array<{ pageKey: string; totalMs: number; avgMs: number; exits: number }>;
   rows: Array<{
@@ -27,6 +28,7 @@ type DetailsResponse = {
     viewport_h: number | null;
     language: string | null;
     tz: string | null;
+    meta: Record<string, unknown> | null;
   }>;
 };
 
@@ -43,13 +45,16 @@ export default function DetailsPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [data, setData] = useState<DetailsResponse | null>(null);
+  const [includeBots, setIncludeBots] = useState(false);
 
   const loadData = useCallback(async () => {
     setLoading(true);
     setError('');
 
     try {
-      const res = await fetch('/api/details/data', { cache: 'no-store' });
+      const res = await fetch(`/api/details/data${includeBots ? '?includeBots=1' : ''}`, {
+        cache: 'no-store',
+      });
       if (res.status === 401) {
         setData(null);
         return;
@@ -65,7 +70,7 @@ export default function DetailsPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [includeBots]);
 
   useEffect(() => {
     void loadData();
@@ -138,6 +143,14 @@ export default function DetailsPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl md:text-3xl font-semibold">Analytics Details</h1>
         <div className="flex gap-2">
+          <label className="flex items-center gap-2 text-xs text-slate-300 rounded-lg border border-slate-600 px-3 py-2">
+            <input
+              type="checkbox"
+              checked={includeBots}
+              onChange={(e) => setIncludeBots(e.target.checked)}
+            />
+            Include bots
+          </label>
           <button
             onClick={() => void loadData()}
             className="rounded-lg border border-slate-600 px-4 py-2 text-sm"
@@ -240,4 +253,3 @@ export default function DetailsPage() {
     </main>
   );
 }
-

@@ -41,6 +41,8 @@ let currentPageKey: string | null = null;
 let currentPageStart = 0;
 let currentVisitorName = '';
 let flushTimer: number | null = null;
+let sessionEnded = false;
+let sessionEnding = false;
 const eventQueue: AnalyticsEvent[] = [];
 
 const getSessionId = (): string => {
@@ -163,17 +165,24 @@ export const initAnalytics = (visitorName?: string) => {
   pushEvent({ eventType: 'session_start' });
   void flushAnalytics();
 
+  const endSessionOnce = (reason: 'hidden' | 'pagehide') => {
+    if (sessionEnded || sessionEnding) return;
+    sessionEnding = true;
+    endCurrentPage(reason);
+    pushEvent({ eventType: 'session_end', meta: { reason } });
+    sessionEnded = true;
+    void flushAnalytics().finally(() => {
+      sessionEnding = false;
+    });
+  };
+
   const onHidden = () => {
     if (document.visibilityState !== 'hidden') return;
-    endCurrentPage('hidden');
-    pushEvent({ eventType: 'session_end' });
-    void flushAnalytics();
+    endSessionOnce('hidden');
   };
 
   const onPageHide = () => {
-    endCurrentPage('pagehide');
-    pushEvent({ eventType: 'session_end' });
-    void flushAnalytics();
+    endSessionOnce('pagehide');
   };
 
   document.addEventListener('visibilitychange', onHidden);
@@ -205,6 +214,7 @@ export const endCurrentPage = (reason?: string) => {
 };
 
 export const trackScreenChange = (pageKey: string, visitorName?: string) => {
+  if (sessionEnded) return;
   if (visitorName) currentVisitorName = visitorName;
   if (!pageKey) return;
 

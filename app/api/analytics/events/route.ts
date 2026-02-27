@@ -49,6 +49,18 @@ const getIp = (req: NextRequest): string | null => {
   return toNullableString(req.headers.get('x-real-ip'));
 };
 
+const isLikelyBot = (ua: string | null, path: string | null): boolean => {
+  const userAgent = (ua || '').toLowerCase();
+  const pathname = (path || '').toLowerCase();
+
+  if (!userAgent) return true;
+  if (pathname.includes('/_vercel') || pathname.includes('/api/')) return true;
+
+  return /(bot|spider|crawler|headless|uptime|vercel|monitor|pingdom|checkly|datadog|facebookexternalhit|slurp|curl|wget)/i.test(
+    userAgent
+  );
+};
+
 export async function POST(req: NextRequest) {
   const { supabaseUrl, serviceRoleKey, hasSupabaseUrl, hasServiceRoleKey } =
     getSupabaseServerConfig();
@@ -81,30 +93,38 @@ export async function POST(req: NextRequest) {
 
   const rows = events
     .filter((event) => ALLOWED_EVENT_TYPES.has(String(event.eventType)))
-    .map((event) => ({
-      session_id: sessionId,
-      event_type: String(event.eventType),
-      page_key: toNullableString(event.pageKey),
-      visitor_name: toNullableString(event.visitorName),
-      duration_ms: toNullableInt(event.durationMs),
-      occurred_at: toNullableString(event.occurredAt) ?? new Date().toISOString(),
-      path: toNullableString(event.path),
-      url: toNullableString(event.url),
-      referrer: toNullableString(event.referrer),
-      ip,
-      user_agent: toNullableString(event.userAgent),
-      device_type: toNullableString(event.deviceType),
-      os: toNullableString(event.os),
-      browser: toNullableString(event.browser),
-      viewport_w: toNullableInt(event.viewportW),
-      viewport_h: toNullableInt(event.viewportH),
-      screen_w: toNullableInt(event.screenW),
-      screen_h: toNullableInt(event.screenH),
-      tz: toNullableString(event.tz),
-      language: toNullableString(event.language),
-      is_mobile: typeof event.isMobile === 'boolean' ? event.isMobile : null,
-      meta: event.meta && typeof event.meta === 'object' ? event.meta : {},
-    }));
+    .map((event) => {
+      const path = toNullableString(event.path);
+      const userAgent = toNullableString(event.userAgent);
+      const isBot = isLikelyBot(userAgent, path);
+      return {
+        session_id: sessionId,
+        event_type: String(event.eventType),
+        page_key: toNullableString(event.pageKey),
+        visitor_name: toNullableString(event.visitorName),
+        duration_ms: toNullableInt(event.durationMs),
+        occurred_at: toNullableString(event.occurredAt) ?? new Date().toISOString(),
+        path,
+        url: toNullableString(event.url),
+        referrer: toNullableString(event.referrer),
+        ip,
+        user_agent: userAgent,
+        device_type: toNullableString(event.deviceType),
+        os: toNullableString(event.os),
+        browser: toNullableString(event.browser),
+        viewport_w: toNullableInt(event.viewportW),
+        viewport_h: toNullableInt(event.viewportH),
+        screen_w: toNullableInt(event.screenW),
+        screen_h: toNullableInt(event.screenH),
+        tz: toNullableString(event.tz),
+        language: toNullableString(event.language),
+        is_mobile: typeof event.isMobile === 'boolean' ? event.isMobile : null,
+        meta: {
+          ...(event.meta && typeof event.meta === 'object' ? event.meta : {}),
+          is_bot: isBot,
+        },
+      };
+    });
 
   if (!rows.length) {
     return NextResponse.json({ error: 'No valid events.' }, { status: 400 });

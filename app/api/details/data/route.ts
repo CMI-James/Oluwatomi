@@ -22,6 +22,7 @@ type AnalyticsRow = {
   viewport_h: number | null;
   language: string | null;
   tz: string | null;
+  meta: Record<string, unknown> | null;
 };
 
 export async function GET(req: NextRequest) {
@@ -42,8 +43,9 @@ export async function GET(req: NextRequest) {
     );
   }
 
+  const includeBots = req.nextUrl.searchParams.get('includeBots') === '1';
   const select =
-    'occurred_at,visitor_name,session_id,page_key,event_type,duration_ms,device_type,os,browser,is_mobile,ip,path,url,viewport_w,viewport_h,language,tz';
+    'occurred_at,visitor_name,session_id,page_key,event_type,duration_ms,device_type,os,browser,is_mobile,ip,path,url,viewport_w,viewport_h,language,tz,meta';
   const response = await fetch(
     `${supabaseUrl}/rest/v1/analytics_events?select=${encodeURIComponent(select)}&order=occurred_at.desc&limit=500`,
     {
@@ -64,7 +66,10 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const rows = (await response.json()) as AnalyticsRow[];
+  const rawRows = (await response.json()) as AnalyticsRow[];
+  const rows = includeBots
+    ? rawRows
+    : rawRows.filter((row) => !(row.meta && row.meta.is_bot === true));
 
   const sessions = new Set<string>();
   const deviceCount = { mobile: 0, tablet: 0, desktop: 0, unknown: 0 };
@@ -101,6 +106,7 @@ export async function GET(req: NextRequest) {
       totalEvents: rows.length,
       uniqueSessions: sessions.size,
       deviceCount,
+      includeBots,
     },
     pages,
     rows,
