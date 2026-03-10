@@ -50,7 +50,7 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "For You 💕",
+  title: "For You 💔",
   description: "Something special, just for you.",
 };
 
